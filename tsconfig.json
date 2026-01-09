@@ -20,6 +20,13 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@enums/*": ["src/common/enums/*"],
+      "@common/*": ["src/common/*"],
+      "@users/*": ["src/users/*"],
+      "@products/*": ["src/products/*"],
+      "@stock/*": ["src/stock/*"]
+    }
   }
 }
