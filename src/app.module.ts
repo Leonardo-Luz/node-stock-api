@@ -1,10 +1,11 @@
-import { Module } from '@nestjs/common';
+import { Controller, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import validationConfig from './config/validation.config';
 import { UsersModule } from './modules/users/users.module';
 import { ProductsModule } from './modules/products/products.module';
 import { StockMovementModule } from './modules/stock-movement/stock-movement.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { StockMovementModule } from './modules/stock-movement/stock-movement.mod
     UsersModule,
     ProductsModule,
     StockMovementModule,
-  ]
+  ],
+  controllers: [AppController]
 })
 export class AppModule { }
