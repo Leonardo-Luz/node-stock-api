@@ -6,6 +6,8 @@ import { GetUserDto } from './dtos/get-user.dto';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import * as bcrypt from 'bcrypt'
+import { GetPasswordUserDto } from './dtos/get-password-user.dto';
+import { GetRefreshUserDto } from './dtos/get-refresh-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -19,6 +21,12 @@ export class UsersService {
     return users.map(this.toDto);
   }
 
+  async findByEmail(email: string): Promise<GetPasswordUserDto | null> {
+    const user = await this.userModel.findOne({ email }).select('+password').lean();
+
+    return user ? { ...this.toDto(user), password: user.password } : null
+  }
+
   async findOne(id: string): Promise<GetUserDto> {
     const user = await this.userModel.findById(id).lean();
 
@@ -27,6 +35,13 @@ export class UsersService {
     }
 
     return this.toDto(user);
+  }
+
+
+  async findByIdWithRefreshToken(id: string): Promise<GetRefreshUserDto | null> {
+    const user = await this.userModel.findOne({ _id: id }).select('+hashedRefreshToken').lean();
+
+    return user ? { ...this.toDto(user), hashedRefreshToken: user.hashedRefreshToken } : null
   }
 
   async create(createUserDto: CreateUserDto): Promise<GetUserDto> {
@@ -55,6 +70,16 @@ export class UsersService {
     }
 
     return this.toDto(user);
+  }
+
+  async updateRefreshToken(
+    id: string,
+    hashedRefreshToken: string | null,
+  ): Promise<void> {
+    await this.userModel.updateOne(
+      { _id: id },
+      { hashedRefreshToken },
+    );
   }
 
   async remove(id: string): Promise<void> {
