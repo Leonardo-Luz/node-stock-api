@@ -1,9 +1,11 @@
+import { Public } from "@auth/decorators/public.decorator";
 import { Controller, Get } from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 
 @ApiTags('System')
 @Controller()
 export class AppController {
+  @Public()
   @Get()
   @ApiOperation({ summary: 'Get API metadata and status' })
   root() {
