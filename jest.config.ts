@@ -12,8 +12,9 @@ export default {
   moduleNameMapper: {
     '^@enums/(.*)$': '<rootDir>/common/enums/$1',
     '^@common/(.*)$': '<rootDir>/common/$1',
-    '^@users/(.*)$': '<rootDir>/users/$1',
-    '^@products/(.*)$': '<rootDir>/products/$1',
-    '^@stock/(.*)$': '<rootDir>/stock/$1',
+    '^@users/(.*)$': '<rootDir>/modules/users/$1',
+    '^@products/(.*)$': '<rootDir>/modules/products/$1',
+    '^@stock/(.*)$': '<rootDir>/modules/stock/$1',
+    '^@auth/(.*)$': '<rootDir>/modules/auth/$1',
   },
 };

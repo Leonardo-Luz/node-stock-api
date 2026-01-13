@@ -24,9 +24,10 @@
     "paths": {
       "@enums/*": ["src/common/enums/*"],
       "@common/*": ["src/common/*"],
-      "@users/*": ["src/users/*"],
-      "@products/*": ["src/products/*"],
-      "@stock/*": ["src/stock/*"]
+      "@users/*": ["src/modules/users/*"],
+      "@products/*": ["src/modules/products/*"],
+      "@stock/*": ["src/modules/stock/*"],
+      "@auth/*": ["src/modules/auth/*"]
     }
   }
 }
