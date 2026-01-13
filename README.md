@@ -23,6 +23,8 @@ This project demonstrates how to design a scalable backend for inventory control
 - Fully documented API with Swagger
 - Strong validation and error handling
 - Automated tests with Jest
+- Single Sessions
+- Refresh token
 
 ## Architectural Decisions
 
