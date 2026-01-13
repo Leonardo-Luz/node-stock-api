@@ -23,8 +23,9 @@ This project demonstrates how to design a scalable backend for inventory control
 - Fully documented API with Swagger
 - Strong validation and error handling
 - Automated tests with Jest
+- Authentication with Refresh token
 - Single Sessions
-- Refresh token
+- Role Based protection
 
 ## Architectural Decisions
 
@@ -58,6 +59,7 @@ User(
   email,
   password,
   role,
+  hashedRefreshToken?,
 
   createdAt,
   updatedAt
