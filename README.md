@@ -114,11 +114,9 @@ This project demonstrates how to design a scalable backend for inventory control
 
 ```
 
-## Demonstrations
-
 <div align="center">
 
-### Swagger
+## Swagger Demo
 
 ![Swagger Demonstration Gif](assets/gifs/swagger.gif)
 
@@ -129,13 +127,8 @@ This project demonstrates how to design a scalable backend for inventory control
 ```txt
 
   stock-api
-  ├── assets
-  │   └── videos
-  │       └── swagger.mp4
   ├── docker-compose.yml
   ├── Dockerfile
-  ├── docs
-  │   └── ISSUES.md
   ├── eslint.config.mjs
   ├── Jenkinsfile
   ├── jest.config.ts
