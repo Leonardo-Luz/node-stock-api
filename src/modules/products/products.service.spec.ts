@@ -37,15 +37,19 @@ describe('ProductsService', () => {
         price: 29.99,
         currentStock: 99,
         category: 'Groceries',
-      }
+      };
 
-      mockProductModel.create.mockResolvedValue({
+      const mockData = {
         _id: '1',
         ...data,
         createdAt: new Date(),
         updatedAt: new Date(),
+      };
+
+      mockProductModel.create.mockResolvedValue({
+        ...mockData,
         toObject() {
-          return this;
+          return mockData;
         },
       });
 
@@ -81,30 +85,39 @@ describe('ProductsService', () => {
     it('should return products matching the category', async () => {
       const category = 'Groceries';
 
+      const mockData = [
+        {
+          _id: '1',
+          name: 'Rice',
+          category,
+          price: 29.99,
+          currentStock: 99,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          _id: '2',
+          name: 'Beans',
+          category,
+          price: 19.99,
+          currentStock: 99,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ];
+
       mockProductModel.find.mockReturnValue({
         lean: jest.fn().mockResolvedValue([
           {
-            _id: '1',
-            name: 'Rice',
-            category,
-            price: 29.99,
-            currentStock: 99,
-            createdAt: new Date(),
-            updatedAt: new Date(),
+            ...mockData[0],
             toObject() {
-              return this;
+              return mockData[0];
             },
           },
           {
-            _id: '2',
-            name: 'Beans',
-            category,
-            price: 19.99,
-            currentStock: 99,
-            createdAt: new Date(),
-            updatedAt: new Date(),
+            ...mockData[1],
             toObject() {
-              return this;
+              return mockData[1];
             },
           },
         ]),
@@ -170,9 +183,9 @@ describe('ProductsService', () => {
         lean: jest.fn().mockResolvedValue(null),
       });
 
-      await expect(
-        service.update('1', { name: 'X' }),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.update('1', { name: 'X' })).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 

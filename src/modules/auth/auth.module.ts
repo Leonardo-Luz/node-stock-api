@@ -22,21 +22,18 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
+      useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('ACCESS_SECRET'),
-        expiresIn: configService.get<string>('ACCESS_TOKEN_EXP') ? parseInt(configService.get<string>('ACCESS_TOKEN_EXP')!) : 15 * 60 * 1000,
+        expiresIn: configService.get<string>('ACCESS_TOKEN_EXP')
+          ? parseInt(configService.get<string>('ACCESS_TOKEN_EXP')!)
+          : 15 * 60 * 1000,
       }),
       inject: [ConfigService],
       global: false,
     }),
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    LocalStrategy,
-    AccessStrategy,
-    RefreshStrategy,
-  ],
+  providers: [AuthService, LocalStrategy, AccessStrategy, RefreshStrategy],
   exports: [AuthService],
 })
-export class AuthModule { }
+export class AuthModule {}

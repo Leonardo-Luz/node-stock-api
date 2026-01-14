@@ -12,7 +12,11 @@ import { SignUpDto } from './dtos/sign-up.dto';
 import { Public } from './decorators/public.decorator';
 import { ApiBody, ApiCookieAuth, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
-import { clearAuthCookies, setAccessCookie, setRefreshCookie } from './auth.cookies';
+import {
+  clearAuthCookies,
+  setAccessCookie,
+  setRefreshCookie,
+} from './auth.cookies';
 import { GetPasswordUserDto } from '@users/dtos/get-password-user.dto';
 import { SignInDto } from './dtos/sign-in.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
@@ -22,7 +26,7 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
   @Public()
   @Post('sign-up')
@@ -34,9 +38,7 @@ export class AuthController {
   @Post('sign-in')
   @UseGuards(LocalAuthGuard)
   @ApiBody({ type: SignInDto })
-  async signIn(
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response) {
+  async signIn(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const user = req.user as GetPasswordUserDto;
 
     const accessToken = await this.authService.getAccessToken(user);
@@ -73,7 +75,9 @@ export class AuthController {
   ) {
     const user = req.user as { id: string; role: string };
 
-    const { accessToken, refreshToken } = await this.authService.refreshTokens(user.id);
+    const { accessToken, refreshToken } = await this.authService.refreshTokens(
+      user.id,
+    );
 
     setAccessCookie(res, accessToken);
     setRefreshCookie(res, refreshToken);

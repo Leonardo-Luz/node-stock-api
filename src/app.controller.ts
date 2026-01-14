@@ -1,6 +1,6 @@
-import { Public } from "@auth/decorators/public.decorator";
-import { Controller, Get } from "@nestjs/common";
-import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { Public } from '@auth/decorators/public.decorator';
+import { Controller, Get } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('System')
 @Controller()
@@ -14,7 +14,7 @@ export class AppController {
       version: '1.0.0',
       status: 'ok',
       docs: '/api',
-      time: new Date().toISOString()
+      time: new Date().toISOString(),
     };
   }
 }

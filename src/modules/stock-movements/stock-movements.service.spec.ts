@@ -44,7 +44,7 @@ describe('StockMovementService', () => {
         {
           provide: getModelToken(User.name),
           useValue: mockUserModel,
-        }
+        },
       ],
     }).compile();
 
@@ -58,19 +58,28 @@ describe('StockMovementService', () => {
         quantity: 12,
         type: StockMovementType.IN,
         reason: StockMovementReason.PURCHASE,
-        createdBy: '69616b6b09612500b6b11faa'
-      }
+        createdBy: '69616b6b09612500b6b11faa',
+      };
 
       mockProductModel.updateOne.mockResolvedValue({ modifiedCount: 1 });
-      mockProductModel.exists.mockResolvedValue({ _id: '69616c3558a5f808452e616c' })
-      mockUserModel.exists.mockResolvedValue({ _id: '69616b6b09612500b6b11faa' })
-      mockStockMovementModel.create.mockResolvedValue({
+      mockProductModel.exists.mockResolvedValue({
+        _id: '69616c3558a5f808452e616c',
+      });
+      mockUserModel.exists.mockResolvedValue({
+        _id: '69616b6b09612500b6b11faa',
+      });
+
+      const mockData = {
         _id: '1',
         ...data,
         createdAt: new Date(),
         updatedAt: new Date(),
+      };
+
+      mockStockMovementModel.create.mockResolvedValue({
+        ...mockData,
         toObject() {
-          return this;
+          return mockData;
         },
       });
 
@@ -107,32 +116,41 @@ describe('StockMovementService', () => {
     it('should return stock movement matching the movement reason', async () => {
       const reason = StockMovementReason.PURCHASE;
 
+      const mockData = [
+        {
+          _id: '1',
+          productId: '69616c3558a5f808452e616c',
+          quantity: 12,
+          type: StockMovementType.IN,
+          reason,
+          createdBy: '69616b6b09612500b6b11faa',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          _id: '2',
+          productId: '69616bdd58a5f808452e616a',
+          quantity: 12,
+          type: StockMovementType.IN,
+          reason,
+          createdBy: '69616c9b30fef3f4ae1d8704',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ];
+
       mockStockMovementModel.find.mockReturnValue({
         lean: jest.fn().mockResolvedValue([
           {
-            _id: '1',
-            productId: '69616c3558a5f808452e616c',
-            quantity: 12,
-            type: StockMovementType.IN,
-            reason,
-            createdBy: '69616b6b09612500b6b11faa',
-            createdAt: new Date(),
-            updatedAt: new Date(),
+            ...mockData[0],
             toObject() {
-              return this;
+              return mockData[0];
             },
           },
           {
-            _id: '2',
-            productId: '69616bdd58a5f808452e616a',
-            quantity: 12,
-            type: StockMovementType.IN,
-            reason,
-            createdBy: '69616c9b30fef3f4ae1d8704',
-            createdAt: new Date(),
-            updatedAt: new Date(),
+            ...mockData[1],
             toObject() {
-              return this;
+              return mockData[1];
             },
           },
         ]),
@@ -156,7 +174,7 @@ describe('StockMovementService', () => {
           quantity: 12,
           type: StockMovementType.IN,
           reason: StockMovementReason.PURCHASE,
-          createdBy: '69616b6b09612500b6b11faa'
+          createdBy: '69616b6b09612500b6b11faa',
         }),
       });
 
@@ -177,8 +195,12 @@ describe('StockMovementService', () => {
 
   describe('update', () => {
     it('should update a stock movement', async () => {
-      mockProductModel.exists.mockResolvedValue({ _id: '69616c3558a5f808452e616c' })
-      mockUserModel.exists.mockResolvedValue({ _id: '69616b6b09612500b6b11faa' })
+      mockProductModel.exists.mockResolvedValue({
+        _id: '69616c3558a5f808452e616c',
+      });
+      mockUserModel.exists.mockResolvedValue({
+        _id: '69616b6b09612500b6b11faa',
+      });
       mockProductModel.updateOne.mockResolvedValue({ modifiedCount: 1 });
       mockStockMovementModel.findByIdAndUpdate.mockReturnValue({
         lean: jest.fn().mockResolvedValue({
@@ -187,7 +209,7 @@ describe('StockMovementService', () => {
           quantity: 20,
           type: StockMovementType.IN,
           reason: StockMovementReason.PURCHASE,
-          createdBy: String('69616b6b09612500b6b11faa')
+          createdBy: String('69616b6b09612500b6b11faa'),
         }),
       });
       mockStockMovementModel.findById.mockReturnValue({
@@ -197,7 +219,7 @@ describe('StockMovementService', () => {
           quantity: 20,
           type: StockMovementType.IN,
           reason: StockMovementReason.PURCHASE,
-          createdBy: String('69616b6b09612500b6b11faa')
+          createdBy: String('69616b6b09612500b6b11faa'),
         }),
       });
 
@@ -216,9 +238,9 @@ describe('StockMovementService', () => {
         lean: jest.fn().mockResolvedValue(null),
       });
 
-      await expect(
-        service.update('1', { productId: 'X' }),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.update('1', { productId: 'X' })).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -229,7 +251,9 @@ describe('StockMovementService', () => {
 
       await service.remove('1');
 
-      expect(mockStockMovementModel.findByIdAndDelete).toHaveBeenCalledWith('1');
+      expect(mockStockMovementModel.findByIdAndDelete).toHaveBeenCalledWith(
+        '1',
+      );
     });
 
     it('should throw NotFoundException if stockMovement does not exist', async () => {

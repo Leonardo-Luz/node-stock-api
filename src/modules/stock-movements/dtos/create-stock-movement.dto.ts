@@ -16,11 +16,21 @@ export class CreateStockMovementDto {
   quantity: number;
 
   @IsEnum(StockMovementType)
-  @ApiProperty({ required: true, type: String, enum: StockMovementType, example: StockMovementType.IN })
+  @ApiProperty({
+    required: true,
+    type: String,
+    enum: StockMovementType,
+    example: StockMovementType.IN,
+  })
   type: StockMovementType;
 
   @IsEnum(StockMovementReason)
-  @ApiProperty({ required: true, type: String, enum: StockMovementReason, example: StockMovementReason.PURCHASE })
+  @ApiProperty({
+    required: true,
+    type: String,
+    enum: StockMovementReason,
+    example: StockMovementReason.PURCHASE,
+  })
   reason: StockMovementReason;
 
   @IsMongoId()

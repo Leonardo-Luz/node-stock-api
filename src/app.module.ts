@@ -17,11 +17,11 @@ import { AuthModule } from '@auth/auth.module';
         `.env.${process.env.NODE_ENV}`,
         `.env.${process.env.NODE_ENV}.local`,
         '.env.local',
-      ]
+      ],
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
+      useFactory: (configService: ConfigService) => ({
         uri: configService.get<string>('MONGO_URI'),
       }),
       inject: [ConfigService],
@@ -32,6 +32,6 @@ import { AuthModule } from '@auth/auth.module';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: []
+  providers: [],
 })
-export class AppModule { }
+export class AppModule {}

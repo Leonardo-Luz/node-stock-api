@@ -41,15 +41,19 @@ describe('UsersService', () => {
     it('should hash password and return public user data', async () => {
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashed-password');
 
-      mockUserModel.create.mockResolvedValue({
+      const mockData = {
         _id: '1',
         name: 'John Doe',
         email: 'john@mail.com',
         role: UserRole.VIEWER,
         createdAt: new Date(),
         updatedAt: new Date(),
+      };
+
+      mockUserModel.create.mockResolvedValue({
+        ...mockData,
         toObject() {
-          return this;
+          return mockData;
         },
       });
 
@@ -144,9 +148,9 @@ describe('UsersService', () => {
         lean: jest.fn().mockResolvedValue(null),
       });
 
-      await expect(
-        service.update('1', { name: 'X' }),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.update('1', { name: 'X' })).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 

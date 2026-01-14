@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { StockMovement, StockMovementDocument } from './stock-movement.schema';
@@ -9,6 +13,14 @@ import { FindStockMovementQueryDto } from './dtos/find-stock-movement-query.dto'
 import { ProductDocument, Product } from '../products/product.schema';
 import { StockMovementType } from '@enums/stock-movement-type.enum';
 import { User, UserDocument } from '../users/user.schema';
+import { StockMovementReason } from '@enums/stock-movement-reason.enum';
+
+interface ParsedFilterQuery {
+  productId?: string;
+  reason?: StockMovementReason;
+  type?: StockMovementType;
+  createdBy?: string;
+}
 
 @Injectable()
 export class StockMovementsService {
@@ -19,10 +31,12 @@ export class StockMovementsService {
     private readonly productModel: Model<ProductDocument>,
     @InjectModel(User.name)
     private readonly userModel: Model<UserDocument>,
-  ) { }
+  ) {}
 
-  async findAll(query?: FindStockMovementQueryDto): Promise<GetStockMovementDto[]> {
-    const filter: any = {};
+  async findAll(
+    query?: FindStockMovementQueryDto,
+  ): Promise<GetStockMovementDto[]> {
+    const filter: ParsedFilterQuery = {};
 
     if (query?.productId) filter.productId = query.productId;
 
@@ -46,8 +60,12 @@ export class StockMovementsService {
     return this.toDto(stockMovement);
   }
 
-  async create(createStockMovementDto: CreateStockMovementDto): Promise<GetStockMovementDto> {
-    const productExists = await this.productModel.exists({ _id: createStockMovementDto.productId });
+  async create(
+    createStockMovementDto: CreateStockMovementDto,
+  ): Promise<GetStockMovementDto> {
+    const productExists = await this.productModel.exists({
+      _id: createStockMovementDto.productId,
+    });
 
     if (!productExists) {
       throw new NotFoundException(
@@ -55,7 +73,9 @@ export class StockMovementsService {
       );
     }
 
-    const userExists = await this.userModel.exists({ _id: createStockMovementDto.createdBy });
+    const userExists = await this.userModel.exists({
+      _id: createStockMovementDto.createdBy,
+    });
 
     if (!userExists) {
       throw new NotFoundException(
@@ -69,9 +89,10 @@ export class StockMovementsService {
         { $set: { currentStock: createStockMovementDto.quantity } },
       );
     } else {
-      const delta = createStockMovementDto.type === StockMovementType.OUT
-        ? -createStockMovementDto.quantity
-        : createStockMovementDto.quantity;
+      const delta =
+        createStockMovementDto.type === StockMovementType.OUT
+          ? -createStockMovementDto.quantity
+          : createStockMovementDto.quantity;
 
       const result = await this.productModel.updateOne(
         {
@@ -88,7 +109,9 @@ export class StockMovementsService {
       }
     }
 
-    const movement = await this.stockMovementModel.create(createStockMovementDto);
+    const movement = await this.stockMovementModel.create(
+      createStockMovementDto,
+    );
     return this.toDto(movement.toObject());
   }
 
@@ -115,9 +138,8 @@ export class StockMovementsService {
     const newType = dto.type ?? existing.type;
     const newQuantity = dto.quantity ?? existing.quantity;
 
-    const newDelta = newType === StockMovementType.OUT
-      ? -newQuantity
-      : newQuantity;
+    const newDelta =
+      newType === StockMovementType.OUT ? -newQuantity : newQuantity;
 
     if (oldDelta !== null) {
       await this.productModel.updateOne(
@@ -194,9 +216,9 @@ export class StockMovementsService {
     await this.stockMovementModel.findByIdAndDelete(id);
   }
 
-  private toDto(stockMovement: any): GetStockMovementDto {
+  private toDto(stockMovement: StockMovementDocument): GetStockMovementDto {
     return {
-      id: stockMovement._id,
+      id: stockMovement._id.toString(),
       productId: stockMovement.productId,
       quantity: stockMovement.quantity,
       type: stockMovement.type,

@@ -11,4 +11,3 @@ export class SignInDto {
   @ApiProperty({ example: 'sEcure-p@ssw0rd' })
   password: string;
 }
-

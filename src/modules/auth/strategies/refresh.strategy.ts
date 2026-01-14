@@ -1,9 +1,10 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { PassportStrategy } from "@nestjs/passport";
-import { Request } from "express";
-import { ExtractJwt, Strategy } from "passport-jwt";
-import { UsersService } from "@users/users.service";
-import * as bcrypt from 'bcrypt'
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { PassportStrategy } from '@nestjs/passport';
+import { Request } from 'express';
+import { ExtractJwt, Strategy } from 'passport-jwt';
+import { UsersService } from '@users/users.service';
+import * as bcrypt from 'bcrypt';
+import { JwtPayload } from '@auth/interfaces/jwt-payload.interface';
 
 @Injectable()
 export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
@@ -13,13 +14,13 @@ export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
       passReqToCallback: true,
       secretOrKey: process.env.REFRESH_SECRET!,
       jwtFromRequest: ExtractJwt.fromExtractors([
-        (request: Request) => request?.cookies['refresh-token']
-      ])
-    })
+        (request: Request) => request?.cookies['refresh-token'] as string,
+      ]),
+    });
   }
 
-  async validate(req: Request, payload: any) {
-    const refreshToken = req.cookies['refresh-token'];
+  async validate(req: Request, payload: JwtPayload) {
+    const refreshToken = req.cookies['refresh-token'] as string;
 
     const user = await this.usersService.findByIdWithRefreshToken(payload.sub);
 
@@ -30,7 +31,7 @@ export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
     const valid = await bcrypt.compare(refreshToken, user.hashedRefreshToken);
 
     if (!valid) {
-      this.usersService.updateRefreshToken(payload.sub, null);
+      await this.usersService.updateRefreshToken(payload.sub, null);
       throw new UnauthorizedException();
     }
 

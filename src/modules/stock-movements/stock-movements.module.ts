@@ -18,4 +18,4 @@ import { User, UserSchema } from '../users/user.schema';
   controllers: [StockMovementsController],
   exports: [StockMovementsService],
 })
-export class StockMovementsModule { }
+export class StockMovementsModule {}

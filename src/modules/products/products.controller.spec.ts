@@ -25,7 +25,7 @@ describe('ProductsController', () => {
       ],
     }).compile();
 
-    productsService = moduleRef.get(ProductsService) as jest.Mocked<ProductsService>;
+    productsService = moduleRef.get(ProductsService);
     productsController = moduleRef.get(ProductsController);
   });
 
@@ -108,9 +108,7 @@ describe('ProductsController', () => {
         id: '1',
       });
 
-      expect(productsService.findOne).toHaveBeenCalledWith(
-        '1',
-      );
+      expect(productsService.findOne).toHaveBeenCalledWith('1');
       expect(result).toEqual(product);
     });
   });
@@ -134,10 +132,7 @@ describe('ProductsController', () => {
         { price: 20.0 },
       );
 
-      expect(productsService.update).toHaveBeenCalledWith(
-        '1',
-        { price: 20.0 },
-      );
+      expect(productsService.update).toHaveBeenCalledWith('1', { price: 20.0 });
       expect(result).toEqual(updatedProduct);
     });
   });
@@ -152,9 +147,7 @@ describe('ProductsController', () => {
         }),
       ).resolves.toBeUndefined();
 
-      expect(productsService.remove).toHaveBeenCalledWith(
-        '1',
-      );
+      expect(productsService.remove).toHaveBeenCalledWith('1');
     });
   });
 });

@@ -1,6 +1,13 @@
 import { ProductStatus } from '@enums/product-status.enum';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNumber, IsOptional, IsString, Min, MinLength } from 'class-validator';
+import {
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+  MinLength,
+} from 'class-validator';
 
 export class UpdateProductDto {
   @IsOptional()
@@ -11,7 +18,10 @@ export class UpdateProductDto {
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ required: false, example: 'Premium long-grain white rice, 5kg package' })
+  @ApiProperty({
+    required: false,
+    example: 'Premium long-grain white rice, 5kg package',
+  })
   description?: string;
 
   @IsNumber({ maxDecimalPlaces: 2 })
@@ -38,6 +48,10 @@ export class UpdateProductDto {
 
   @IsOptional()
   @IsEnum(ProductStatus)
-  @ApiProperty({ enum: ProductStatus, example: ProductStatus.ACTIVE, default: ProductStatus.ACTIVE })
+  @ApiProperty({
+    enum: ProductStatus,
+    example: ProductStatus.ACTIVE,
+    default: ProductStatus.ACTIVE,
+  })
   status?: string;
 }

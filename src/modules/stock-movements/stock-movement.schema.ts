@@ -5,7 +5,7 @@ import { HydratedDocument } from 'mongoose';
 
 export type StockMovementDocument = HydratedDocument<StockMovement>;
 
-@Schema({ timestamps: true, collection: 'stockMovement' })
+@Schema({ timestamps: true, collection: 'stockMovements' })
 export class StockMovement {
   @Prop({ required: true })
   productId: string;
@@ -16,11 +16,19 @@ export class StockMovement {
   @Prop({ required: true, type: String, enum: StockMovementType, index: true })
   type: StockMovementType;
 
-  @Prop({ required: true, type: String, enum: StockMovementReason, index: true })
+  @Prop({
+    required: true,
+    type: String,
+    enum: StockMovementReason,
+    index: true,
+  })
   reason: StockMovementReason;
 
   @Prop({ required: true, index: true })
   createdBy: string;
+
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export const StockMovementSchema = SchemaFactory.createForClass(StockMovement);

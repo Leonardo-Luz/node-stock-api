@@ -8,7 +8,10 @@ export class GetProductDto {
   @ApiProperty({ required: true, example: 'White Rice 5kg' })
   name: string;
 
-  @ApiProperty({ required: false, example: 'Premium long-grain white rice, 5kg package' })
+  @ApiProperty({
+    required: false,
+    example: 'Premium long-grain white rice, 5kg package',
+  })
   description?: string;
 
   @ApiProperty({ required: true, example: 24.99 })
@@ -25,7 +28,11 @@ export class GetProductDto {
   @ApiProperty({ required: true, example: 'Groceries' })
   category: string;
 
-  @ApiProperty({ enum: ProductStatus, example: ProductStatus.ACTIVE, default: ProductStatus.ACTIVE })
+  @ApiProperty({
+    enum: ProductStatus,
+    example: ProductStatus.ACTIVE,
+    default: ProductStatus.ACTIVE,
+  })
   status?: string;
 
   @ApiProperty({ type: String, format: 'date-time' })

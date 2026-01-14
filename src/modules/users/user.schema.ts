@@ -20,6 +20,9 @@ export class User {
 
   @Prop({ required: false, type: String, select: false })
   hashedRefreshToken?: string;
+
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

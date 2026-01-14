@@ -1,7 +1,7 @@
-import { ProductStatus } from "@enums/product-status.enum";
-import { ApiProperty } from "@nestjs/swagger";
-import { Type } from "class-transformer";
-import { IsEnum, IsNumber, IsOptional, IsString, Min } from "class-validator";
+import { ProductStatus } from '@enums/product-status.enum';
+import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsEnum, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 
 export class FindProductsQueryDto {
   @IsOptional()

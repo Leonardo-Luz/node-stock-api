@@ -1,11 +1,15 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from './user.schema';
 import { GetUserDto } from './dtos/get-user.dto';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
-import * as bcrypt from 'bcrypt'
+import * as bcrypt from 'bcrypt';
 import { GetPasswordUserDto } from './dtos/get-password-user.dto';
 import { GetRefreshUserDto } from './dtos/get-refresh-user.dto';
 
@@ -14,7 +18,7 @@ export class UsersService {
   constructor(
     @InjectModel(User.name)
     private readonly userModel: Model<UserDocument>,
-  ) { }
+  ) {}
 
   async findAll(): Promise<GetUserDto[]> {
     const users = await this.userModel.find().lean();
@@ -22,9 +26,12 @@ export class UsersService {
   }
 
   async findByEmail(email: string): Promise<GetPasswordUserDto | null> {
-    const user = await this.userModel.findOne({ email }).select('+password').lean();
+    const user = await this.userModel
+      .findOne({ email })
+      .select('+password')
+      .lean();
 
-    return user ? { ...this.toDto(user), password: user.password } : null
+    return user ? { ...this.toDto(user), password: user.password } : null;
   }
 
   async findOne(id: string): Promise<GetUserDto> {
@@ -37,21 +44,32 @@ export class UsersService {
     return this.toDto(user);
   }
 
+  async findByIdWithRefreshToken(
+    id: string,
+  ): Promise<GetRefreshUserDto | null> {
+    const user = await this.userModel
+      .findOne({ _id: id })
+      .select('+hashedRefreshToken')
+      .lean();
 
-  async findByIdWithRefreshToken(id: string): Promise<GetRefreshUserDto | null> {
-    const user = await this.userModel.findOne({ _id: id }).select('+hashedRefreshToken').lean();
-
-    return user ? { ...this.toDto(user), hashedRefreshToken: user.hashedRefreshToken } : null
+    return user
+      ? { ...this.toDto(user), hashedRefreshToken: user.hashedRefreshToken }
+      : null;
   }
 
   async create(createUserDto: CreateUserDto): Promise<GetUserDto> {
-    createUserDto.password = await bcrypt.hash(createUserDto.password, 12)
+    createUserDto.password = await bcrypt.hash(createUserDto.password, 12);
 
     try {
       const createdUser = await this.userModel.create(createUserDto);
       return this.toDto(createdUser.toObject());
-    } catch (error: any) {
-      if (error.code === 11000 && error.keyPattern?.email) {
+    } catch (error) {
+      const errorData = error as {
+        code: number;
+        keyPattern?: { email: string };
+      };
+
+      if (errorData.code === 11000 && errorData.keyPattern?.email) {
         throw new ConflictException('Email already in use');
       }
 
@@ -59,12 +77,9 @@ export class UsersService {
     }
   }
 
-  async update(
-    id: string,
-    updateUserDto: UpdateUserDto,
-  ): Promise<GetUserDto> {
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<GetUserDto> {
     if (updateUserDto.password)
-      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 12)
+      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 12);
 
     const user = await this.userModel
       .findByIdAndUpdate(id, updateUserDto, {
@@ -84,10 +99,7 @@ export class UsersService {
     id: string,
     hashedRefreshToken: string | null,
   ): Promise<void> {
-    await this.userModel.updateOne(
-      { _id: id },
-      { hashedRefreshToken },
-    );
+    await this.userModel.updateOne({ _id: id }, { hashedRefreshToken });
   }
 
   async remove(id: string): Promise<void> {
@@ -98,14 +110,14 @@ export class UsersService {
     }
   }
 
-  private toDto(user: any): GetUserDto {
+  private toDto(user: UserDocument): GetUserDto {
     return {
-      id: user._id,
+      id: user._id.toString(),
       name: user.name,
       email: user.email,
       role: user.role,
       createdAt: user.createdAt,
-      updatedAt: user.updatedAt
+      updatedAt: user.updatedAt,
     };
   }
 }

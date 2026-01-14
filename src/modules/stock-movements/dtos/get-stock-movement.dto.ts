@@ -12,10 +12,20 @@ export class GetStockMovementDto {
   @ApiProperty({ required: true, example: 12 })
   quantity: number;
 
-  @ApiProperty({ required: true, type: String, enum: StockMovementType, example: StockMovementType.IN })
+  @ApiProperty({
+    required: true,
+    type: String,
+    enum: StockMovementType,
+    example: StockMovementType.IN,
+  })
   type: StockMovementType;
 
-  @ApiProperty({ required: true, type: String, enum: StockMovementReason, example: StockMovementReason.PURCHASE })
+  @ApiProperty({
+    required: true,
+    type: String,
+    enum: StockMovementReason,
+    example: StockMovementReason.PURCHASE,
+  })
   reason: StockMovementReason;
 
   @ApiProperty({ required: true, example: '69616b6b09612500b6b11faa' })

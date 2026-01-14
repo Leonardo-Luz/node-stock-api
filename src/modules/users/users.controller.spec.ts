@@ -26,7 +26,7 @@ describe('UsersController', () => {
       ],
     }).compile();
 
-    usersService = moduleRef.get(UsersService) as jest.Mocked<UsersService>;
+    usersService = moduleRef.get(UsersService);
     usersController = moduleRef.get(UsersController);
   });
 

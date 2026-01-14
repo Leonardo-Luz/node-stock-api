@@ -27,7 +27,7 @@ describe('StockMovementController', () => {
       ],
     }).compile();
 
-    stockMovementService = moduleRef.get(StockMovementsService) as jest.Mocked<StockMovementsService>;
+    stockMovementService = moduleRef.get(StockMovementsService);
     stockMovementController = moduleRef.get(StockMovementsController);
   });
 
@@ -38,7 +38,7 @@ describe('StockMovementController', () => {
         quantity: 12,
         type: StockMovementType.IN,
         reason: StockMovementReason.PURCHASE,
-        createdBy: '69616b6b09612500b6b11faa'
+        createdBy: '69616b6b09612500b6b11faa',
       };
 
       const serviceResult: GetStockMovementDto = {
@@ -114,9 +114,7 @@ describe('StockMovementController', () => {
         id: '1',
       });
 
-      expect(stockMovementService.findOne).toHaveBeenCalledWith(
-        '1',
-      );
+      expect(stockMovementService.findOne).toHaveBeenCalledWith('1');
       expect(result).toEqual(stockMovement);
     });
   });
@@ -141,10 +139,9 @@ describe('StockMovementController', () => {
         { quantity: 20.0 },
       );
 
-      expect(stockMovementService.update).toHaveBeenCalledWith(
-        '1',
-        { quantity: 20.0 },
-      );
+      expect(stockMovementService.update).toHaveBeenCalledWith('1', {
+        quantity: 20.0,
+      });
       expect(result).toEqual(updatedStockMovement);
     });
   });
@@ -159,9 +156,7 @@ describe('StockMovementController', () => {
         }),
       ).resolves.toBeUndefined();
 
-      expect(stockMovementService.remove).toHaveBeenCalledWith(
-        '1',
-      );
+      expect(stockMovementService.remove).toHaveBeenCalledWith('1');
     });
   });
 });

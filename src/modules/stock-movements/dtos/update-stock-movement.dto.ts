@@ -19,12 +19,22 @@ export class UpdateStockMovementDto {
 
   @IsOptional()
   @IsEnum(StockMovementType)
-  @ApiProperty({ required: false, type: String, enum: StockMovementType, example: StockMovementType.IN })
+  @ApiProperty({
+    required: false,
+    type: String,
+    enum: StockMovementType,
+    example: StockMovementType.IN,
+  })
   type?: StockMovementType;
 
   @IsOptional()
   @IsEnum(StockMovementReason)
-  @ApiProperty({ required: false, type: String, enum: StockMovementReason, example: StockMovementReason.PURCHASE })
+  @ApiProperty({
+    required: false,
+    type: String,
+    enum: StockMovementReason,
+    example: StockMovementReason.PURCHASE,
+  })
   reason?: StockMovementReason;
 
   @IsOptional()

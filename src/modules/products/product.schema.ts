@@ -21,8 +21,17 @@ export class Product {
   @Prop({ required: true, index: true })
   category: string;
 
-  @Prop({ required: false, type: String, enum: ProductStatus, default: ProductStatus.ACTIVE, index: true })
+  @Prop({
+    required: false,
+    type: String,
+    enum: ProductStatus,
+    default: ProductStatus.ACTIVE,
+    index: true,
+  })
   status: string;
+
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);

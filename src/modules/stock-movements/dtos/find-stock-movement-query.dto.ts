@@ -1,7 +1,7 @@
-import { StockMovementReason } from "@enums/stock-movement-reason.enum";
-import { StockMovementType } from "@enums/stock-movement-type.enum";
-import { ApiProperty } from "@nestjs/swagger";
-import { IsEnum, IsMongoId, IsOptional } from "class-validator";
+import { StockMovementReason } from '@enums/stock-movement-reason.enum';
+import { StockMovementType } from '@enums/stock-movement-type.enum';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEnum, IsMongoId, IsOptional } from 'class-validator';
 
 export class FindStockMovementQueryDto {
   @IsOptional()

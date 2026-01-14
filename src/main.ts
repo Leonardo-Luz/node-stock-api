@@ -6,8 +6,8 @@ import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const port = process.env.PORT ?? 3000
-  const host = process.env.HOST ?? 'localhost'
+  const port = process.env.PORT ?? 3000;
+  const host = process.env.HOST ?? 'localhost';
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -36,21 +36,22 @@ async function bootstrap() {
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory, {
     swaggerOptions: {
-      withCredentials: true
-    }
+      withCredentials: true,
+    },
   });
   app.setGlobalPrefix('api/v1', {
-    exclude: [
-      { path: '/', method: RequestMethod.GET },
-    ]
-  })
-
+    exclude: [{ path: '/', method: RequestMethod.GET }],
+  });
 
   app.enableCors({
     origin: `http://${host}:${port}`,
     credentials: true,
   });
-  app.use(cookieParser())
+  app.use(cookieParser());
   await app.listen(port, host);
 }
-bootstrap();
+
+bootstrap().catch((err) => {
+  console.error('Bootstrap failed', err);
+  process.exit(1);
+});
