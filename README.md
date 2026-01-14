@@ -51,7 +51,9 @@ This project demonstrates how to design a scalable backend for inventory control
 ## Swagger Demo
 
 <div align="center">
-  <video src="assets/videos/swagger.mp4" controls autoplay loop muted></video>
+
+https://raw.githubusercontent.com/leonardo-luz/node-stock-api/main/assets/videos/swagger.mp4
+
 </div>
 
 ## Project Structure
