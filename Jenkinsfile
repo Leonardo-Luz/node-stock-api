@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   environment {
-    NODE_ENV = 'production'
+    NODE_ENV = 'development'
   }
 
   stages {
@@ -20,9 +20,6 @@ pipeline {
     }
 
     stage('Lint') {
-      environment {
-        NODE_ENV = 'development'
-      }
       steps {
         sh 'npm run lint'
       }
