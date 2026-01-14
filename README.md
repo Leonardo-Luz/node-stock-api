@@ -52,7 +52,7 @@ This project demonstrates how to design a scalable backend for inventory control
 
 <div align="center">
 
-https://raw.githubusercontent.com/leonardo-luz/node-stock-api/main/assets/videos/swagger.mp4
+WIP
 
 </div>
 
