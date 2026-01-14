@@ -31,7 +31,7 @@ export class StockMovementsService {
     private readonly productModel: Model<ProductDocument>,
     @InjectModel(User.name)
     private readonly userModel: Model<UserDocument>,
-  ) {}
+  ) { }
 
   async findAll(
     query?: FindStockMovementQueryDto,
@@ -181,6 +181,10 @@ export class StockMovementsService {
         runValidators: true,
       })
       .lean();
+
+    if (!updated) {
+      throw new NotFoundException();
+    }
 
     return this.toDto(updated);
   }
