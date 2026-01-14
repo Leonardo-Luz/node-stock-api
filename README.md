@@ -3,8 +3,13 @@
 # Stock Manager API
 
 ![Node](https://img.shields.io/badge/node-%3E=18-green)
-![NestJS](https://img.shields.io/badge/nestjs-backend-red)
+![MongoDB](https://img.shields.io/badge/mongodb-%3E=6.0-green)
 ![Tests](https://img.shields.io/badge/tests-jest-brightgreen)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?&logo=docker&logoColor=white)
+![Jenkins](https://img.shields.io/badge/jenkins-%23d24939.svg?&logo=jenkins&logoColor=white)
+![NestJS](https://img.shields.io/badge/nestjs-%23e0234e.svg?&logo=nestjs&logoColor=white)
 
 </div>
 
@@ -15,15 +20,15 @@ This project demonstrates how to design a scalable backend for inventory control
 ## Features
 
 - Product catalog management
-- Stock control through **stock movement events**
-- Role-based user system
+- Stock control through **event-driven stock movements**
+- Role-based user system with **access control**
 - Consistent RESTful routing
-- Fully documented API with Swagger
-- Strong validation and error handling
-- Automated tests with Jest
-- Authentication with Refresh token
-- Single Sessions
-- Role Based protection
+- Fully documented API with **Swagger**
+- Strong **validation** and **error handling**
+- Automated tests with **Jest**
+- Server-side authentication with **refresh tokens**
+- Secure Single active sessions per user
+- Role-based route protection
 
 ## Architectural Decisions
 
@@ -44,15 +49,78 @@ This project demonstrates how to design a scalable backend for inventory control
 - **Database:** MongoDB
 - **ODM:** Mongoose
 - **Validation:** class-validator
+- **Authentication:** JWT and cookies with access and refresh tokens
 - **Testing:** Jest (TDD approach)
+- **CI:** Jenkins  
+- **Containerization:** Docker  
 - **Linting & Formatting:** ESLint + Prettier
 - **Documentation:** Swagger (OpenAPI)
 
-## Swagger Demo
+## Getting Started
+
+1. Clone the repository
+
+```sh
+
+  git clone https://github.com/Leonardo-Luz/node-stock-api.git
+  cd node-stock-api
+
+```
+
+2. Set up environment variables
+
+* **Local development**: Create a `.env.development` file in the root directory and add your variables.
+(Example: `.env.development.example` included in the repo)
+* **Production**: Create a `.env.production` file in the root directory, set `NODE_ENV=production`, and add your variables.
+(Example: `.env.development.example` included in the repo)
+* **Docker**: Create a `.env.docker` file in the root directory and add your variables.
+(Example: `.env.docker.example` included in the repo)
+
+3. Run the project locally
+
+* Development
+
+```
+
+  npm install
+  npm start:dev
+
+```
+
+* Production
+
+```
+
+  npm install
+  npm run build
+  npm start:prod
+
+```
+
+* Docker
+
+```
+
+  docker compose up
+
+```
+
+4. Running Tests
+
+```
+
+  npm run test
+  npm run test:cov
+
+```
+
+## Demonstrations
 
 <div align="center">
 
-WIP
+### Swagger
+
+![Swagger Demonstration Gif](assets/gifs/swagger.gif)
 
 </div>
 
@@ -228,3 +296,7 @@ Enum Type (
   'IN', 'OUT', 'ADJUSTMENT'
 )
 ```
+
+## License
+
+This project is licensed under the [MIT License](LICENSE.md).  
