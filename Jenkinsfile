@@ -20,6 +20,9 @@ pipeline {
     }
 
     stage('Lint') {
+      environment {
+        NODE_ENV = 'development'
+      }
       steps {
         sh 'npm run lint'
       }
@@ -32,6 +35,9 @@ pipeline {
     }
 
     stage('Build') {
+      environment {
+        NODE_ENV = 'production'
+      }
       steps {
         sh 'npm run build'
       }
