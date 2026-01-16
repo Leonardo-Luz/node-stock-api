@@ -6,23 +6,17 @@ import { GetProductDto } from './dtos/get-product.dto';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
 import { FindProductsQueryDto } from './dtos/find-products-query.dto';
-import { ProductStatus } from '@enums/product-status.enum';
-
-interface ParsedFilterQuery {
-  category?: string;
-  status?: ProductStatus;
-  price?: { $gte?: number; $lte?: number };
-}
+import { ParsedQueryFilterProducts } from './interfaces/parsed-query-filter-products.interface';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectModel(Product.name)
     private readonly productModel: Model<ProductDocument>,
-  ) {}
+  ) { }
 
   async findAll(query?: FindProductsQueryDto): Promise<GetProductDto[]> {
-    const filter: ParsedFilterQuery = {};
+    const filter: ParsedQueryFilterProducts = {};
 
     if (query?.category) {
       filter.category = query.category;
