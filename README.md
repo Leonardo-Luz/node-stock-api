@@ -17,6 +17,13 @@ A **Stock Management REST API** built with **NestJS**, focused on **clean code p
 
 This project demonstrates how to design a scalable backend for inventory control using **event-based stock tracking** instead of direct state mutation.
 
+## Live Demo
+
+- **Base API URL:** https://node-stock-api-production.up.railway.app
+- **Swagger UI:** https://node-stock-api-production.up.railway.app/api
+
+> Deployed using Docker on Railway with MongoDB Atlas.
+
 ## Features
 
 - Product catalog management
@@ -54,6 +61,7 @@ This project demonstrates how to design a scalable backend for inventory control
 - **CI:** Jenkins  
 - **Containerization:** Docker  
 - **Linting & Formatting:** ESLint + Prettier
+- **Hosting:** Railway
 - **Documentation:** Swagger (OpenAPI)
 
 ## Getting Started
