@@ -1,16 +1,15 @@
 import { Test } from '@nestjs/testing';
-import { getModelToken } from '@nestjs/mongoose';
 import { NotFoundException } from '@nestjs/common';
 
 import { ProductsService } from './products.service';
-import { Product } from './product.schema';
+import { ProductRepository } from './product.repository';
 
-const mockProductModel = {
-  find: jest.fn(),
-  findById: jest.fn(),
+const mockProductRepository = {
+  findAll: jest.fn(),
+  findOne: jest.fn(),
   create: jest.fn(),
-  findByIdAndUpdate: jest.fn(),
-  findByIdAndDelete: jest.fn(),
+  update: jest.fn(),
+  delete: jest.fn(),
 };
 
 describe('ProductsService', () => {
@@ -21,8 +20,8 @@ describe('ProductsService', () => {
       providers: [
         ProductsService,
         {
-          provide: getModelToken(Product.name),
-          useValue: mockProductModel,
+          provide: ProductRepository,
+          useValue: mockProductRepository,
         },
       ],
     }).compile();
@@ -40,13 +39,13 @@ describe('ProductsService', () => {
       };
 
       const mockData = {
-        _id: '1',
+        id: '1',
         ...data,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
 
-      mockProductModel.create.mockResolvedValue({
+      mockProductRepository.create.mockResolvedValue({
         ...mockData,
         toObject() {
           return mockData;
@@ -55,17 +54,17 @@ describe('ProductsService', () => {
 
       const result = await service.create(data);
 
-      expect(mockProductModel.create).toHaveBeenCalledWith(data);
+      expect(mockProductRepository.create).toHaveBeenCalledWith(data);
       expect(result.id).toBe('1');
     });
   });
 
   describe('findAll', () => {
     it('should return mapped products', async () => {
-      mockProductModel.find.mockReturnValue({
-        lean: jest.fn().mockResolvedValue([
+      mockProductRepository.findAll.mockReturnValue(
+        [
           {
-            _id: '1',
+            id: '1',
             name: 'Rice',
             price: 29.99,
             currentStock: 99,
@@ -73,8 +72,7 @@ describe('ProductsService', () => {
             createdAt: new Date(),
             updatedAt: new Date(),
           },
-        ]),
-      });
+        ])
 
       const result = await service.findAll({});
 
@@ -87,7 +85,7 @@ describe('ProductsService', () => {
 
       const mockData = [
         {
-          _id: '1',
+          id: '1',
           name: 'Rice',
           category,
           price: 29.99,
@@ -96,7 +94,7 @@ describe('ProductsService', () => {
           updatedAt: new Date(),
         },
         {
-          _id: '2',
+          id: '2',
           name: 'Beans',
           category,
           price: 19.99,
@@ -106,8 +104,8 @@ describe('ProductsService', () => {
         },
       ];
 
-      mockProductModel.find.mockReturnValue({
-        lean: jest.fn().mockResolvedValue([
+      mockProductRepository.findAll.mockReturnValue(
+        [
           {
             ...mockData[0],
             toObject() {
@@ -120,12 +118,11 @@ describe('ProductsService', () => {
               return mockData[1];
             },
           },
-        ]),
-      });
+        ])
 
       const result = await service.findAll({ category });
 
-      expect(mockProductModel.find).toHaveBeenCalledWith({ category });
+      expect(mockProductRepository.findAll).toHaveBeenCalledWith({ category });
       expect(result).toHaveLength(2);
       expect(result[0].id).toBe('1');
       expect(result[1].id).toBe('2');
@@ -134,26 +131,22 @@ describe('ProductsService', () => {
 
   describe('findOne', () => {
     it('should return a single product', async () => {
-      mockProductModel.findById.mockReturnValue({
-        lean: jest.fn().mockResolvedValue({
-          _id: '1',
-          name: 'Rice',
-          price: 29.99,
-          currentStock: 99,
-          category: 'Groceries',
-        }),
+      mockProductRepository.findOne.mockReturnValue({
+        id: '1',
+        name: 'Rice',
+        price: 29.99,
+        currentStock: 99,
+        category: 'Groceries',
       });
 
       const result = await service.findOne('1');
 
-      expect(mockProductModel.findById).toHaveBeenCalledWith('1');
+      expect(mockProductRepository.findOne).toHaveBeenCalledWith('1');
       expect(result.id).toBe('1');
     });
 
     it('should throw NotFoundException if product does not exist', async () => {
-      mockProductModel.findById.mockReturnValue({
-        lean: jest.fn().mockResolvedValue(null),
-      });
+      mockProductRepository.findOne.mockReturnValue(null);
 
       await expect(service.findOne('1')).rejects.toThrow(NotFoundException);
     });
@@ -161,14 +154,12 @@ describe('ProductsService', () => {
 
   describe('update', () => {
     it('should update a product', async () => {
-      mockProductModel.findByIdAndUpdate.mockReturnValue({
-        lean: jest.fn().mockResolvedValue({
-          _id: '1',
-          name: 'Rice',
-          price: 20.0,
-          currentStock: 99,
-          category: 'Groceries',
-        }),
+      mockProductRepository.update.mockReturnValue({
+        _id: '1',
+        name: 'Rice',
+        price: 20.0,
+        currentStock: 99,
+        category: 'Groceries',
       });
 
       const result = await service.update('1', {
@@ -179,9 +170,7 @@ describe('ProductsService', () => {
     });
 
     it('should throw NotFoundException if product does not exist', async () => {
-      mockProductModel.findByIdAndUpdate.mockReturnValue({
-        lean: jest.fn().mockResolvedValue(null),
-      });
+      mockProductRepository.update.mockReturnValue(null);
 
       await expect(service.update('1', { name: 'X' })).rejects.toThrow(
         NotFoundException,
@@ -191,15 +180,15 @@ describe('ProductsService', () => {
 
   describe('remove', () => {
     it('should delete product successfully', async () => {
-      mockProductModel.findByIdAndDelete.mockResolvedValue({ _id: '1' });
+      mockProductRepository.delete.mockResolvedValue({ _id: '1' });
 
       await service.remove('1');
 
-      expect(mockProductModel.findByIdAndDelete).toHaveBeenCalledWith('1');
+      expect(mockProductRepository.delete).toHaveBeenCalledWith('1');
     });
 
     it('should throw NotFoundException if product does not exist', async () => {
-      mockProductModel.findByIdAndDelete.mockResolvedValue(null);
+      mockProductRepository.delete.mockResolvedValue(null);
 
       await expect(service.remove('1')).rejects.toThrow(NotFoundException);
     });
