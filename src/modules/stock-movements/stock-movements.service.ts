@@ -13,14 +13,7 @@ import { FindStockMovementQueryDto } from './dtos/find-stock-movement-query.dto'
 import { ProductDocument, Product } from '../products/product.schema';
 import { StockMovementType } from '@enums/stock-movement-type.enum';
 import { User, UserDocument } from '../users/user.schema';
-import { StockMovementReason } from '@enums/stock-movement-reason.enum';
-
-interface ParsedFilterQuery {
-  productId?: string;
-  reason?: StockMovementReason;
-  type?: StockMovementType;
-  createdBy?: string;
-}
+import { ParsedQueryFilterStockMovement } from './interfaces/parsed-query-filter-stock-movements';
 
 @Injectable()
 export class StockMovementsService {
@@ -36,7 +29,7 @@ export class StockMovementsService {
   async findAll(
     query?: FindStockMovementQueryDto,
   ): Promise<GetStockMovementDto[]> {
-    const filter: ParsedFilterQuery = {};
+    const filter: ParsedQueryFilterStockMovement = {};
 
     if (query?.productId) filter.productId = query.productId;
 
