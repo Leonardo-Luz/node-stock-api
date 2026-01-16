@@ -78,11 +78,10 @@ This project demonstrates how to design a scalable backend for inventory control
 2. Set up environment variables
 
 * **Local development**: Create a `.env.development` file in the root directory and add your variables.
-(Example: `.env.development.example` included in the repo)
 * **Production**: Create a `.env.production` file in the root directory, set `NODE_ENV=production`, and add your variables.
-(Example: `.env.development.example` included in the repo)
 * **Docker**: Create a `.env.docker` file in the root directory and add your variables.
-(Example: `.env.docker.example` included in the repo)
+
+> `.env` examples included in the repository.
 
 3. Run the project locally
 
