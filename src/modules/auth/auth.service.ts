@@ -1,11 +1,11 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
-import { GetUserDto } from '../users/dtos/get-user.dto';
+import { UsersService } from '@users/users.service';
+import { GetUserDto } from '@users/dtos/get-user.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { SignUpDto } from './dtos/sign-up.dto';
 import { SignInDto } from './dtos/sign-in.dto';
-import { GetPasswordUserDto } from '../users/dtos/get-password-user.dto';
+import { GetPasswordUserDto } from '@users/dtos/get-password-user.dto';
 import { JwtUserPayload } from './interfaces/jwt-user-payload.interface';
 
 @Injectable()
@@ -13,7 +13,7 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async register(signUpDto: SignUpDto): Promise<GetUserDto> {
     return await this.usersService.create(signUpDto);
