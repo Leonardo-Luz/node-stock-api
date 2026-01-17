@@ -180,11 +180,11 @@ describe('ProductsService', () => {
 
   describe('remove', () => {
     it('should delete product successfully', async () => {
-      mockProductRepository.delete.mockResolvedValue({ _id: '1' });
+      mockProductRepository.delete.mockResolvedValue({ id: '1' });
 
-      await service.remove('1');
+      const result = await service.remove('1');
 
-      expect(mockProductRepository.delete).toHaveBeenCalledWith('1');
+      expect(result.id).toBe('1');
     });
 
     it('should throw NotFoundException if product does not exist', async () => {

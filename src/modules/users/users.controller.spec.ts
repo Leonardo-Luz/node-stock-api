@@ -18,7 +18,7 @@ describe('UsersController', () => {
           useValue: {
             create: jest.fn(),
             findAll: jest.fn(),
-            findOne: jest.fn(),
+            findById: jest.fn(),
             update: jest.fn(),
             remove: jest.fn(),
           },
@@ -98,13 +98,13 @@ describe('UsersController', () => {
         updatedAt: new Date(),
       };
 
-      usersService.findOne.mockResolvedValue(user);
+      usersService.findById.mockResolvedValue(user);
 
       const result = await usersController.findOne({
         id: 'a93fe07b-7a93-4bf4-8b2c-77eaa41ba220',
       });
 
-      expect(usersService.findOne).toHaveBeenCalledWith(
+      expect(usersService.findById).toHaveBeenCalledWith(
         'a93fe07b-7a93-4bf4-8b2c-77eaa41ba220',
       );
       expect(result).toEqual(user);

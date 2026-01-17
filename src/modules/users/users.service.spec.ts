@@ -1,22 +1,21 @@
 import { Test } from '@nestjs/testing';
-import { getModelToken } from '@nestjs/mongoose';
 import { NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
 import { UsersService } from './users.service';
-import { User } from './user.schema';
 import { UserRole } from '@enums/user-role.enum';
+import { UserRepository } from './user.repository';
 
 jest.mock('bcrypt', () => ({
   hash: jest.fn(),
 }));
 
-const mockUserModel = {
-  find: jest.fn(),
+const mockUserRepository = {
+  findAll: jest.fn(),
   findById: jest.fn(),
   create: jest.fn(),
-  findByIdAndUpdate: jest.fn(),
-  findByIdAndDelete: jest.fn(),
+  update: jest.fn(),
+  delete: jest.fn(),
 };
 
 describe('UsersService', () => {
@@ -27,8 +26,8 @@ describe('UsersService', () => {
       providers: [
         UsersService,
         {
-          provide: getModelToken(User.name),
-          useValue: mockUserModel,
+          provide: UserRepository,
+          useValue: mockUserRepository,
         },
       ],
     }).compile();
@@ -42,7 +41,7 @@ describe('UsersService', () => {
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashed-password');
 
       const mockData = {
-        _id: '1',
+        id: '1',
         name: 'John Doe',
         email: 'john@mail.com',
         role: UserRole.VIEWER,
@@ -50,7 +49,7 @@ describe('UsersService', () => {
         updatedAt: new Date(),
       };
 
-      mockUserModel.create.mockResolvedValue({
+      mockUserRepository.create.mockResolvedValue({
         ...mockData,
         toObject() {
           return mockData;
@@ -64,7 +63,7 @@ describe('UsersService', () => {
       });
 
       expect(bcrypt.hash).toHaveBeenCalledWith('plain-password', 12);
-      expect(mockUserModel.create).toHaveBeenCalledWith({
+      expect(mockUserRepository.create).toHaveBeenCalledWith({
         name: 'John Doe',
         email: 'john@mail.com',
         password: 'hashed-password',
@@ -75,18 +74,16 @@ describe('UsersService', () => {
 
   describe('findAll', () => {
     it('should return mapped users', async () => {
-      mockUserModel.find.mockReturnValue({
-        lean: jest.fn().mockResolvedValue([
-          {
-            _id: '1',
-            name: 'John Doe',
-            email: 'john@mail.com',
-            role: UserRole.VIEWER,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        ]),
-      });
+      mockUserRepository.findAll.mockReturnValue([
+        {
+          id: '1',
+          name: 'John Doe',
+          email: 'john@mail.com',
+          role: UserRole.VIEWER,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ])
 
       const result = await service.findAll();
 
@@ -98,27 +95,23 @@ describe('UsersService', () => {
 
   describe('findOne', () => {
     it('should return a single user', async () => {
-      mockUserModel.findById.mockReturnValue({
-        lean: jest.fn().mockResolvedValue({
-          _id: '1',
-          name: 'John Doe',
-          email: 'john@mail.com',
-          role: UserRole.VIEWER,
-        }),
+      mockUserRepository.findById.mockReturnValue({
+        id: '1',
+        name: 'John Doe',
+        email: 'john@mail.com',
+        role: UserRole.VIEWER,
       });
 
-      const result = await service.findOne('1');
+      const result = await service.findById('1');
 
-      expect(mockUserModel.findById).toHaveBeenCalledWith('1');
+      expect(mockUserRepository.findById).toHaveBeenCalledWith('1');
       expect(result.id).toBe('1');
     });
 
     it('should throw NotFoundException if user does not exist', async () => {
-      mockUserModel.findById.mockReturnValue({
-        lean: jest.fn().mockResolvedValue(null),
-      });
+      mockUserRepository.findById.mockReturnValue(null);
 
-      await expect(service.findOne('1')).rejects.toThrow(NotFoundException);
+      await expect(service.findById('1')).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -126,13 +119,11 @@ describe('UsersService', () => {
     it('should hash password when updating it', async () => {
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashed-password');
 
-      mockUserModel.findByIdAndUpdate.mockReturnValue({
-        lean: jest.fn().mockResolvedValue({
-          _id: '1',
-          name: 'John Updated',
-          email: 'john@mail.com',
-          role: UserRole.VIEWER,
-        }),
+      mockUserRepository.update.mockReturnValue({
+        id: '1',
+        name: 'John Updated',
+        email: 'john@mail.com',
+        role: UserRole.VIEWER,
       });
 
       const result = await service.update('1', {
@@ -144,9 +135,7 @@ describe('UsersService', () => {
     });
 
     it('should throw NotFoundException if user does not exist', async () => {
-      mockUserModel.findByIdAndUpdate.mockReturnValue({
-        lean: jest.fn().mockResolvedValue(null),
-      });
+      mockUserRepository.update.mockReturnValue(null);
 
       await expect(service.update('1', { name: 'X' })).rejects.toThrow(
         NotFoundException,
@@ -156,13 +145,15 @@ describe('UsersService', () => {
 
   describe('remove', () => {
     it('should delete user successfully', async () => {
-      mockUserModel.findByIdAndDelete.mockResolvedValue({ _id: '1' });
+      mockUserRepository.delete.mockResolvedValue({ id: '1' });
 
-      await expect(service.remove('1')).resolves.toBeUndefined();
+      const result = await service.remove('1');
+
+      expect(result.id).toBe('1');
     });
 
     it('should throw NotFoundException if user does not exist', async () => {
-      mockUserModel.findByIdAndDelete.mockResolvedValue(null);
+      mockUserRepository.delete.mockResolvedValue(null);
 
       await expect(service.remove('1')).rejects.toThrow(NotFoundException);
     });
