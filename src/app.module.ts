@@ -33,4 +33,4 @@ import { AuthModule } from '@auth/auth.module';
   ],
   controllers: [AppController],
 })
-export class AppModule { }
+export class AppModule {}

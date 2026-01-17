@@ -8,9 +8,7 @@ import { ProductRepository } from './product.repository';
 
 @Injectable()
 export class ProductsService {
-  constructor(
-    private readonly productRepository: ProductRepository,
-  ) { }
+  constructor(private readonly productRepository: ProductRepository) {}
 
   async findAll(query?: FindProductsQueryDto): Promise<GetProductDto[]> {
     const filter: ParsedQueryFilterProducts = {};
@@ -44,7 +42,8 @@ export class ProductsService {
   }
 
   async create(createProductDto: CreateProductDto): Promise<GetProductDto> {
-    const createdProduct = await this.productRepository.create(createProductDto);
+    const createdProduct =
+      await this.productRepository.create(createProductDto);
 
     return createdProduct;
   }
@@ -53,7 +52,7 @@ export class ProductsService {
     id: string,
     updateProductDto: UpdateProductDto,
   ): Promise<GetProductDto> {
-    const product = await this.productRepository.update(id, updateProductDto)
+    const product = await this.productRepository.update(id, updateProductDto);
 
     if (!product) {
       throw new NotFoundException(`Product with id ${id} not found`);
@@ -69,6 +68,6 @@ export class ProductsService {
       throw new NotFoundException(`Product with id ${id} not found`);
     }
 
-    return result
+    return result;
   }
 }

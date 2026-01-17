@@ -61,18 +61,17 @@ describe('ProductsService', () => {
 
   describe('findAll', () => {
     it('should return mapped products', async () => {
-      mockProductRepository.findAll.mockReturnValue(
-        [
-          {
-            id: '1',
-            name: 'Rice',
-            price: 29.99,
-            currentStock: 99,
-            category: 'Groceries',
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        ])
+      mockProductRepository.findAll.mockReturnValue([
+        {
+          id: '1',
+          name: 'Rice',
+          price: 29.99,
+          currentStock: 99,
+          category: 'Groceries',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ]);
 
       const result = await service.findAll({});
 
@@ -104,21 +103,20 @@ describe('ProductsService', () => {
         },
       ];
 
-      mockProductRepository.findAll.mockReturnValue(
-        [
-          {
-            ...mockData[0],
-            toObject() {
-              return mockData[0];
-            },
+      mockProductRepository.findAll.mockReturnValue([
+        {
+          ...mockData[0],
+          toObject() {
+            return mockData[0];
           },
-          {
-            ...mockData[1],
-            toObject() {
-              return mockData[1];
-            },
+        },
+        {
+          ...mockData[1],
+          toObject() {
+            return mockData[1];
           },
-        ])
+        },
+      ]);
 
       const result = await service.findAll({ category });
 

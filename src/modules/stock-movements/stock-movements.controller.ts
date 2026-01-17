@@ -43,7 +43,7 @@ export class DeleteParams {
 @ApiTags('Stock Movements')
 @Controller('stock-movements')
 export class StockMovementsController {
-  constructor(private readonly stockMovementsService: StockMovementsService) { }
+  constructor(private readonly stockMovementsService: StockMovementsService) {}
 
   @ApiCookieAuth('access_token')
   @ApiRoles(UserRole.ADMIN, UserRole.MANAGER, UserRole.VIEWER)

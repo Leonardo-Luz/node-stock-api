@@ -19,7 +19,7 @@ export class StockMovementsService {
     private readonly stockMovementRepository: StockMovementRepository,
     private readonly productRepository: ProductRepository,
     private readonly userRepository: UserRepository,
-  ) { }
+  ) {}
 
   async findAll(
     query?: FindStockMovementQueryDto,
@@ -51,7 +51,9 @@ export class StockMovementsService {
   async create(
     createStockMovementDto: CreateStockMovementDto,
   ): Promise<GetStockMovementDto> {
-    const productExists = await this.productRepository.exists(createStockMovementDto.productId);
+    const productExists = await this.productRepository.exists(
+      createStockMovementDto.productId,
+    );
 
     if (!productExists) {
       throw new NotFoundException(
@@ -59,7 +61,9 @@ export class StockMovementsService {
       );
     }
 
-    const userExists = await this.userRepository.exists(createStockMovementDto.createdBy);
+    const userExists = await this.userRepository.exists(
+      createStockMovementDto.createdBy,
+    );
 
     if (!userExists) {
       throw new NotFoundException(
@@ -68,11 +72,15 @@ export class StockMovementsService {
     }
 
     if (createStockMovementDto.type === StockMovementType.ADJUSTMENT) {
-      await this.productRepository.setStockQuantity(createStockMovementDto.productId, createStockMovementDto.quantity);
+      await this.productRepository.setStockQuantity(
+        createStockMovementDto.productId,
+        createStockMovementDto.quantity,
+      );
     } else {
-      const delta = createStockMovementDto.type === StockMovementType.OUT
-        ? -createStockMovementDto.quantity
-        : createStockMovementDto.quantity;
+      const delta =
+        createStockMovementDto.type === StockMovementType.OUT
+          ? -createStockMovementDto.quantity
+          : createStockMovementDto.quantity;
 
       const success = await this.productRepository.applyStockDelta(
         createStockMovementDto.productId,
@@ -113,7 +121,8 @@ export class StockMovementsService {
     const newType = dto.type ?? existing.type;
     const newQuantity = dto.quantity ?? existing.quantity;
 
-    const newDelta = newType === StockMovementType.OUT ? -newQuantity : newQuantity;
+    const newDelta =
+      newType === StockMovementType.OUT ? -newQuantity : newQuantity;
 
     if (oldDelta !== null) {
       await this.productRepository.revertStockDelta(oldProductId, oldDelta);
@@ -122,7 +131,10 @@ export class StockMovementsService {
     if (newType === StockMovementType.ADJUSTMENT) {
       await this.productRepository.setStockQuantity(newProductId, newQuantity);
     } else {
-      const success = await this.productRepository.applyStockDelta(newProductId, newDelta);
+      const success = await this.productRepository.applyStockDelta(
+        newProductId,
+        newDelta,
+      );
 
       if (!success) {
         if (oldDelta !== null) {
@@ -154,7 +166,10 @@ export class StockMovementsService {
           ? movement.quantity
           : -movement.quantity;
 
-      const success = await this.productRepository.applyStockDelta(movement.productId, delta);
+      const success = await this.productRepository.applyStockDelta(
+        movement.productId,
+        delta,
+      );
 
       if (!success) {
         throw new BadRequestException('Cannot revert stock movement');

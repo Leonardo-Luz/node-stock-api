@@ -69,7 +69,9 @@ describe('StockMovementService', () => {
       mockUserRepository.exists.mockResolvedValue({
         _id: '69616b6b09612500b6b11faa',
       });
-      mockProductRepository.update.mockResolvedValue({ id: '69616c3558a5f808452e616c' });
+      mockProductRepository.update.mockResolvedValue({
+        id: '69616c3558a5f808452e616c',
+      });
       mockProductRepository.applyStockDelta.mockResolvedValue(true);
 
       const mockData = {
@@ -106,7 +108,7 @@ describe('StockMovementService', () => {
           createdAt: new Date(),
           updatedAt: new Date(),
         },
-      ])
+      ]);
 
       const result = await service.findAll();
 
@@ -153,11 +155,13 @@ describe('StockMovementService', () => {
             return mockData[1];
           },
         },
-      ])
+      ]);
 
       const result = await service.findAll({ reason });
 
-      expect(mockStockMovementRepository.findAll).toHaveBeenCalledWith({ reason });
+      expect(mockStockMovementRepository.findAll).toHaveBeenCalledWith({
+        reason,
+      });
       expect(result).toHaveLength(2);
       expect(result[0].id).toBe('1');
       expect(result[1].id).toBe('2');
@@ -208,7 +212,7 @@ describe('StockMovementService', () => {
         type: StockMovementType.IN,
         reason: StockMovementReason.PURCHASE,
         createdBy: '69616b6b09612500b6b11faa',
-      })
+      });
       mockStockMovementRepository.findOne.mockReturnValue({
         id: '1',
         productId: '69616c3558a5f808452e616c',
@@ -237,8 +241,14 @@ describe('StockMovementService', () => {
 
   describe('remove', () => {
     it('should delete stock movement successfully', async () => {
-      mockStockMovementRepository.findOne.mockResolvedValue({ id: '1', productId: '1' });
-      mockStockMovementRepository.delete.mockResolvedValue({ id: '1', productId: '1' });
+      mockStockMovementRepository.findOne.mockResolvedValue({
+        id: '1',
+        productId: '1',
+      });
+      mockStockMovementRepository.delete.mockResolvedValue({
+        id: '1',
+        productId: '1',
+      });
       mockProductRepository.applyStockDelta.mockResolvedValue({ id: '1' });
 
       const result = await service.remove('1');

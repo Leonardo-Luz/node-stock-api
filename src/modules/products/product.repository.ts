@@ -1,19 +1,19 @@
-import { Injectable } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import { Product, ProductDocument } from "./product.schema";
-import { Model } from "mongoose";
-import { UpdateUserDto } from "@users/dtos/update-user.dto";
-import { ParsedQueryFilterProducts } from "./interfaces/parsed-query-filter-products.interface";
-import { CreateProductDto } from "./dtos/create-product.dto";
-import { plainToInstance } from "class-transformer";
-import { GetProductDto } from "./dtos/get-product.dto";
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Product, ProductDocument } from './product.schema';
+import { Model } from 'mongoose';
+import { UpdateUserDto } from '@users/dtos/update-user.dto';
+import { ParsedQueryFilterProducts } from './interfaces/parsed-query-filter-products.interface';
+import { CreateProductDto } from './dtos/create-product.dto';
+import { plainToInstance } from 'class-transformer';
+import { GetProductDto } from './dtos/get-product.dto';
 
 @Injectable()
 export class ProductRepository {
   constructor(
     @InjectModel(Product.name)
     private readonly productModel: Model<ProductDocument>,
-  ) { }
+  ) {}
 
   async exists(id: string) {
     return await this.productModel.exists({
@@ -26,18 +26,18 @@ export class ProductRepository {
 
     return plainToInstance(GetProductDto, products, {
       excludeExtraneousValues: true,
-    })
+    });
   }
 
   async findOne(id: string) {
     console.log(await this.productModel.find().lean());
     const product = await this.productModel.findById(id).lean();
 
-    console.log(product)
+    console.log(product);
 
     return plainToInstance(GetProductDto, product, {
       excludeExtraneousValues: true,
-    })
+    });
   }
 
   async create(createProductDto: CreateProductDto) {
@@ -45,7 +45,7 @@ export class ProductRepository {
 
     return plainToInstance(GetProductDto, product, {
       excludeExtraneousValues: true,
-    })
+    });
   }
 
   async update(id: string, updateProductDto: UpdateUserDto) {
@@ -58,7 +58,7 @@ export class ProductRepository {
 
     return plainToInstance(GetProductDto, product, {
       excludeExtraneousValues: true,
-    })
+    });
   }
 
   async delete(id: string) {
@@ -66,13 +66,10 @@ export class ProductRepository {
 
     return plainToInstance(GetProductDto, product, {
       excludeExtraneousValues: true,
-    })
+    });
   }
 
-  async applyStockDelta(
-    id: string,
-    delta: number,
-  ): Promise<boolean> {
+  async applyStockDelta(id: string, delta: number): Promise<boolean> {
     const result = await this.productModel.updateOne(
       {
         _id: id,
@@ -86,10 +83,7 @@ export class ProductRepository {
     return result.modifiedCount === 1;
   }
 
-  async setStockQuantity(
-    id: string,
-    quantity: number,
-  ): Promise<boolean> {
+  async setStockQuantity(id: string, quantity: number): Promise<boolean> {
     const result = await this.productModel.updateOne(
       { _id: id },
       { $set: { currentStock: quantity } },
@@ -98,10 +92,7 @@ export class ProductRepository {
     return result.modifiedCount === 1;
   }
 
-  async revertStockDelta(
-    id: string,
-    previousDelta: number,
-  ): Promise<boolean> {
+  async revertStockDelta(id: string, previousDelta: number): Promise<boolean> {
     const result = await this.productModel.updateOne(
       { _id: id },
       { $inc: { currentStock: -previousDelta } },

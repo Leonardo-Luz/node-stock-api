@@ -10,7 +10,13 @@ import {
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dtos/sign-up.dto';
 import { Public } from './decorators/public.decorator';
-import { ApiBody, ApiCookieAuth, ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiCookieAuth,
+  ApiProperty,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import {
   clearAuthCookies,
@@ -40,7 +46,7 @@ export class SuccessResponse {
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
   @Public()
   @Post('sign-up')

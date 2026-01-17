@@ -41,7 +41,7 @@ export class DeleteParams {
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
   @ApiCookieAuth('access_token')
   @ApiRoles(UserRole.ADMIN)

@@ -12,7 +12,7 @@ export class AuthService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
 
   async register(signUpDto: SignUpDto): Promise<GetUserDto> {
     return await this.userRepository.create(signUpDto);

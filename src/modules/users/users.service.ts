@@ -11,9 +11,7 @@ import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    private readonly userRepository: UserRepository,
-  ) { }
+  constructor(private readonly userRepository: UserRepository) {}
 
   async findAll(): Promise<GetUserDto[]> {
     return await this.userRepository.findAll();
@@ -65,8 +63,7 @@ export class UsersService {
     if (updateUserDto.password)
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, 12);
 
-    const user = await this.userRepository
-      .update(id, updateUserDto);
+    const user = await this.userRepository.update(id, updateUserDto);
 
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);

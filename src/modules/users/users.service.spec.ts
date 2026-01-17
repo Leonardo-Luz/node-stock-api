@@ -83,7 +83,7 @@ describe('UsersService', () => {
           createdAt: new Date(),
           updatedAt: new Date(),
         },
-      ])
+      ]);
 
       const result = await service.findAll();
 

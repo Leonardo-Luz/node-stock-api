@@ -1,18 +1,18 @@
-import { Injectable } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import { User, UserDocument } from "./user.schema";
-import { Model } from "mongoose";
-import { UpdateUserDto } from "@users/dtos/update-user.dto";
-import { CreateUserDto } from "./dtos/create-user.dto";
-import { plainToInstance } from "class-transformer";
-import { GetUserDto } from "./dtos/get-user.dto";
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { User, UserDocument } from './user.schema';
+import { Model } from 'mongoose';
+import { UpdateUserDto } from '@users/dtos/update-user.dto';
+import { CreateUserDto } from './dtos/create-user.dto';
+import { plainToInstance } from 'class-transformer';
+import { GetUserDto } from './dtos/get-user.dto';
 
 @Injectable()
 export class UserRepository {
   constructor(
     @InjectModel(User.name)
     private readonly userModel: Model<UserDocument>,
-  ) { }
+  ) {}
 
   async exists(id: string) {
     return await this.userModel.exists({
@@ -25,7 +25,7 @@ export class UserRepository {
 
     return plainToInstance(GetUserDto, users, {
       excludeExtraneousValues: true,
-    })
+    });
   }
 
   async findById(id: string) {
@@ -33,7 +33,7 @@ export class UserRepository {
 
     return plainToInstance(GetUserDto, user, {
       excludeExtraneousValues: true,
-    })
+    });
   }
 
   async findByEmail(email: string) {
@@ -44,7 +44,7 @@ export class UserRepository {
 
     return plainToInstance(GetUserDto, user, {
       excludeExtraneousValues: true,
-    })
+    });
   }
 
   async findByIdWithRefreshToken(id: string) {
@@ -55,7 +55,7 @@ export class UserRepository {
 
     return plainToInstance(GetUserDto, user, {
       excludeExtraneousValues: true,
-    })
+    });
   }
 
   async create(createUserDto: CreateUserDto) {
@@ -63,13 +63,17 @@ export class UserRepository {
 
     return plainToInstance(GetUserDto, user, {
       excludeExtraneousValues: true,
-    })
+    });
   }
 
   async updateRefreshToken(id: string, hashedRefreshToken: string | null) {
-    await this.userModel.findByIdAndUpdate(id, { hashedRefreshToken }, {
-      runValidators: true,
-    })
+    await this.userModel.findByIdAndUpdate(
+      id,
+      { hashedRefreshToken },
+      {
+        runValidators: true,
+      },
+    );
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
@@ -82,7 +86,7 @@ export class UserRepository {
 
     return plainToInstance(GetUserDto, user, {
       excludeExtraneousValues: true,
-    })
+    });
   }
 
   async delete(id: string) {
@@ -90,6 +94,6 @@ export class UserRepository {
 
     return plainToInstance(GetUserDto, user, {
       excludeExtraneousValues: true,
-    })
+    });
   }
 }

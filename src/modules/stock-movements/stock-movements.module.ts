@@ -13,10 +13,10 @@ import { UsersModule } from '@users/users.module';
       { name: StockMovement.name, schema: StockMovementSchema },
     ]),
     ProductsModule,
-    UsersModule
+    UsersModule,
   ],
   providers: [StockMovementsService, StockMovementRepository],
   controllers: [StockMovementsController],
   exports: [StockMovementsService],
 })
-export class StockMovementsModule { }
+export class StockMovementsModule {}
