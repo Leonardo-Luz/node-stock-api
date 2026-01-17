@@ -62,11 +62,13 @@ export class ProductsService {
     return product;
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: string): Promise<GetProductDto> {
     const result = await this.productRepository.delete(id);
 
     if (!result) {
       throw new NotFoundException(`Product with id ${id} not found`);
     }
+
+    return result
   }
 }

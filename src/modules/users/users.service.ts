@@ -82,11 +82,13 @@ export class UsersService {
     await this.userRepository.updateRefreshToken(id, hashedRefreshToken);
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: string): Promise<GetUserDto> {
     const result = await this.userRepository.delete(id);
 
     if (!result) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
+
+    return result;
   }
 }

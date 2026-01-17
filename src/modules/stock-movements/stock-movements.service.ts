@@ -141,7 +141,7 @@ export class StockMovementsService {
     return updated;
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: string): Promise<GetStockMovementDto> {
     const movement = await this.stockMovementRepository.findOne(id);
 
     if (!movement) {
@@ -161,6 +161,6 @@ export class StockMovementsService {
       }
     }
 
-    await this.stockMovementRepository.delete(id);
+    return await this.stockMovementRepository.delete(id);
   }
 }
