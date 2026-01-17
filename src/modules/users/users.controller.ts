@@ -41,7 +41,7 @@ export class DeleteParams {
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @ApiCookieAuth('access_token')
   @ApiRoles(UserRole.ADMIN)
@@ -58,7 +58,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Get(':id')
   async findOne(@Param() params: FindOneParams): Promise<GetUserDto> {
-    return await this.usersService.findOne(params.id);
+    return await this.usersService.findById(params.id);
   }
 
   @ApiCookieAuth('access_token')
@@ -88,6 +88,6 @@ export class UsersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Delete(':id')
   async remove(@Param() params: DeleteParams) {
-    await this.usersService.remove(params.id);
+    return await this.usersService.remove(params.id);
   }
 }

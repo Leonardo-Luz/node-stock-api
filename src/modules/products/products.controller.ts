@@ -43,7 +43,7 @@ export class DeleteParams {
 @ApiTags('Products')
 @Controller('products')
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(private readonly productsService: ProductsService) { }
 
   @ApiCookieAuth('access_token')
   @ApiRoles(UserRole.ADMIN, UserRole.MANAGER, UserRole.VIEWER)
@@ -93,7 +93,7 @@ export class ProductsController {
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Delete(':id')
-  async remove(@Param() params: DeleteParams) {
-    await this.productsService.remove(params.id);
+  async remove(@Param() params: DeleteParams): Promise<GetProductDto> {
+    return await this.productsService.remove(params.id);
   }
 }

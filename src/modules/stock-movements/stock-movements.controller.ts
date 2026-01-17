@@ -43,7 +43,7 @@ export class DeleteParams {
 @ApiTags('Stock Movements')
 @Controller('stock-movements')
 export class StockMovementsController {
-  constructor(private readonly stockMovementsService: StockMovementsService) {}
+  constructor(private readonly stockMovementsService: StockMovementsService) { }
 
   @ApiCookieAuth('access_token')
   @ApiRoles(UserRole.ADMIN, UserRole.MANAGER, UserRole.VIEWER)
@@ -97,6 +97,6 @@ export class StockMovementsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Delete(':id')
   async remove(@Param() params: DeleteParams) {
-    await this.stockMovementsService.remove(params.id);
+    return await this.stockMovementsService.remove(params.id);
   }
 }
