@@ -3,66 +3,50 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { User, UserDocument } from './user.schema';
 import { GetUserDto } from './dtos/get-user.dto';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import * as bcrypt from 'bcrypt';
-import { GetPasswordUserDto } from './dtos/get-password-user.dto';
-import { GetRefreshUserDto } from './dtos/get-refresh-user.dto';
+import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectModel(User.name)
-    private readonly userModel: Model<UserDocument>,
-  ) {}
+    private readonly userRepository: UserRepository,
+  ) { }
 
   async findAll(): Promise<GetUserDto[]> {
-    const users = await this.userModel.find().lean();
-    return users.map(this.toDto);
+    return await this.userRepository.findAll();
   }
 
-  async findByEmail(email: string): Promise<GetPasswordUserDto | null> {
-    const user = await this.userModel
-      .findOne({ email })
-      .select('+password')
-      .lean();
+  async findByEmail(email: string): Promise<GetUserDto | null> {
+    const user = await this.userRepository.findByEmail(email);
 
-    return user ? { ...this.toDto(user), password: user.password } : null;
+    return user;
   }
 
-  async findOne(id: string): Promise<GetUserDto> {
-    const user = await this.userModel.findById(id).lean();
+  async findById(id: string): Promise<GetUserDto> {
+    const user = await this.userRepository.findById(id);
 
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
 
-    return this.toDto(user);
+    return user;
   }
 
-  async findByIdWithRefreshToken(
-    id: string,
-  ): Promise<GetRefreshUserDto | null> {
-    const user = await this.userModel
-      .findOne({ _id: id })
-      .select('+hashedRefreshToken')
-      .lean();
+  async findByIdWithRefreshToken(id: string): Promise<GetUserDto | null> {
+    const user = await this.userRepository.findByIdWithRefreshToken(id);
 
-    return user
-      ? { ...this.toDto(user), hashedRefreshToken: user.hashedRefreshToken }
-      : null;
+    return user;
   }
 
   async create(createUserDto: CreateUserDto): Promise<GetUserDto> {
     createUserDto.password = await bcrypt.hash(createUserDto.password, 12);
 
     try {
-      const createdUser = await this.userModel.create(createUserDto);
-      return this.toDto(createdUser.toObject());
+      const createdUser = await this.userRepository.create(createUserDto);
+      return createdUser;
     } catch (error) {
       const errorData = error as {
         code: number;
@@ -81,43 +65,28 @@ export class UsersService {
     if (updateUserDto.password)
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, 12);
 
-    const user = await this.userModel
-      .findByIdAndUpdate(id, updateUserDto, {
-        new: true,
-        runValidators: true,
-      })
-      .lean();
+    const user = await this.userRepository
+      .update(id, updateUserDto);
 
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
 
-    return this.toDto(user);
+    return user;
   }
 
   async updateRefreshToken(
     id: string,
     hashedRefreshToken: string | null,
   ): Promise<void> {
-    await this.userModel.updateOne({ _id: id }, { hashedRefreshToken });
+    await this.userRepository.updateRefreshToken(id, hashedRefreshToken);
   }
 
   async remove(id: string): Promise<void> {
-    const result = await this.userModel.findByIdAndDelete(id);
+    const result = await this.userRepository.delete(id);
 
     if (!result) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
-  }
-
-  private toDto(user: UserDocument): GetUserDto {
-    return {
-      id: user._id.toString(),
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    };
   }
 }
