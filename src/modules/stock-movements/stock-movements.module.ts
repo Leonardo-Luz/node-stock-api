@@ -3,19 +3,20 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { StockMovementsService } from './stock-movements.service';
 import { StockMovementsController } from './stock-movements.controller';
 import { StockMovement, StockMovementSchema } from './stock-movement.schema';
-import { Product, ProductSchema } from '../products/product.schema';
-import { User, UserSchema } from '../users/user.schema';
+import { StockMovementRepository } from './stock-movement.repository';
+import { ProductsModule } from '@products/products.module';
+import { UsersModule } from '@users/users.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: StockMovement.name, schema: StockMovementSchema },
-      { name: Product.name, schema: ProductSchema },
-      { name: User.name, schema: UserSchema },
     ]),
+    ProductsModule,
+    UsersModule
   ],
-  providers: [StockMovementsService],
+  providers: [StockMovementsService, StockMovementRepository],
   controllers: [StockMovementsController],
   exports: [StockMovementsService],
 })
-export class StockMovementsModule {}
+export class StockMovementsModule { }
