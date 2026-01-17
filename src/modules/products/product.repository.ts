@@ -15,6 +15,12 @@ export class ProductRepository {
     private readonly productModel: Model<ProductDocument>,
   ) { }
 
+  async exists(id: string) {
+    return await this.productModel.exists({
+      _id: id,
+    });
+  }
+
   async findAll(filter: ParsedQueryFilterProducts) {
     const products = await this.productModel.find(filter).lean();
 
@@ -24,7 +30,10 @@ export class ProductRepository {
   }
 
   async findOne(id: string) {
+    console.log(await this.productModel.find().lean());
     const product = await this.productModel.findById(id).lean();
+
+    console.log(product)
 
     return plainToInstance(GetProductDto, product, {
       excludeExtraneousValues: true,
@@ -58,5 +67,42 @@ export class ProductRepository {
     return plainToInstance(GetProductDto, product, {
       excludeExtraneousValues: true,
     })
+  }
+
+  async applyStockDelta(
+    id: string,
+    delta: number,
+  ): Promise<boolean> {
+    const result = await this.productModel.updateOne(
+      {
+        _id: id,
+        ...(delta < 0 && {
+          currentStock: { $gte: Math.abs(delta) },
+        }),
+      },
+      { $inc: { currentStock: delta } },
+    );
+
+    return result.modifiedCount === 1;
+  }
+
+  async setStockQuantity(
+    id: string,
+    quantity: number,
+  ): Promise<void> {
+    await this.productModel.updateOne(
+      { _id: id },
+      { $set: { currentStock: quantity } },
+    );
+  }
+
+  async revertStockDelta(
+    id: string,
+    previousDelta: number,
+  ): Promise<void> {
+    await this.productModel.updateOne(
+      { _id: id },
+      { $inc: { currentStock: -previousDelta } },
+    );
   }
 }
