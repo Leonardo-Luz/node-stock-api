@@ -3,33 +3,28 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { StockMovement, StockMovementDocument } from './stock-movement.schema';
 import { GetStockMovementDto } from './dtos/get-stock-movement.dto';
 import { CreateStockMovementDto } from './dtos/create-stock-movement.dto';
 import { UpdateStockMovementDto } from './dtos/update-stock-movement.dto';
 import { FindStockMovementQueryDto } from './dtos/find-stock-movement-query.dto';
-import { ProductDocument, Product } from '../products/product.schema';
 import { StockMovementType } from '@enums/stock-movement-type.enum';
-import { User, UserDocument } from '../users/user.schema';
-import { ParsedQueryFilterStockMovement } from './interfaces/parsed-query-filter-stock-movements';
+import { ParsedQueryFilterStockMovements } from './interfaces/parsed-query-filter-stock-movements';
+import { StockMovementRepository } from './stock-movement.repository';
+import { ProductRepository } from '@products/product.repository';
+import { UserRepository } from '@users/user.repository';
 
 @Injectable()
 export class StockMovementsService {
   constructor(
-    @InjectModel(StockMovement.name)
-    private readonly stockMovementModel: Model<StockMovementDocument>,
-    @InjectModel(Product.name)
-    private readonly productModel: Model<ProductDocument>,
-    @InjectModel(User.name)
-    private readonly userModel: Model<UserDocument>,
+    private readonly stockMovementRepository: StockMovementRepository,
+    private readonly productRepository: ProductRepository,
+    private readonly userRepository: UserRepository,
   ) { }
 
   async findAll(
     query?: FindStockMovementQueryDto,
   ): Promise<GetStockMovementDto[]> {
-    const filter: ParsedQueryFilterStockMovement = {};
+    const filter: ParsedQueryFilterStockMovements = {};
 
     if (query?.productId) filter.productId = query.productId;
 
@@ -39,26 +34,24 @@ export class StockMovementsService {
 
     if (query?.createdBy) filter.createdBy = query.createdBy;
 
-    const stockMovement = await this.stockMovementModel.find(filter).lean();
-    return stockMovement.map(this.toDto);
+    const stockMovement = await this.stockMovementRepository.findAll(filter);
+    return stockMovement;
   }
 
   async findOne(id: string): Promise<GetStockMovementDto> {
-    const stockMovement = await this.stockMovementModel.findById(id).lean();
+    const stockMovement = await this.stockMovementRepository.findOne(id);
 
     if (!stockMovement) {
       throw new NotFoundException(`StockMovement with id ${id} not found`);
     }
 
-    return this.toDto(stockMovement);
+    return stockMovement;
   }
 
   async create(
     createStockMovementDto: CreateStockMovementDto,
   ): Promise<GetStockMovementDto> {
-    const productExists = await this.productModel.exists({
-      _id: createStockMovementDto.productId,
-    });
+    const productExists = await this.productRepository.exists(createStockMovementDto.productId);
 
     if (!productExists) {
       throw new NotFoundException(
@@ -66,9 +59,7 @@ export class StockMovementsService {
       );
     }
 
-    const userExists = await this.userModel.exists({
-      _id: createStockMovementDto.createdBy,
-    });
+    const userExists = await this.userRepository.exists(createStockMovementDto.createdBy);
 
     if (!userExists) {
       throw new NotFoundException(
@@ -77,48 +68,39 @@ export class StockMovementsService {
     }
 
     if (createStockMovementDto.type === StockMovementType.ADJUSTMENT) {
-      await this.productModel.updateOne(
-        { _id: createStockMovementDto.productId },
-        { $set: { currentStock: createStockMovementDto.quantity } },
-      );
+      await this.productRepository.setStockQuantity(createStockMovementDto.productId, createStockMovementDto.quantity);
     } else {
-      const delta =
-        createStockMovementDto.type === StockMovementType.OUT
-          ? -createStockMovementDto.quantity
-          : createStockMovementDto.quantity;
+      const delta = createStockMovementDto.type === StockMovementType.OUT
+        ? -createStockMovementDto.quantity
+        : createStockMovementDto.quantity;
 
-      const result = await this.productModel.updateOne(
-        {
-          _id: createStockMovementDto.productId,
-          ...(delta < 0 && {
-            currentStock: { $gte: Math.abs(delta) },
-          }),
-        },
-        { $inc: { currentStock: delta } },
+      const success = await this.productRepository.applyStockDelta(
+        createStockMovementDto.productId,
+        delta,
       );
 
-      if (result.modifiedCount === 0) {
+      if (!success) {
         throw new BadRequestException('Insufficient stock');
       }
     }
 
-    const movement = await this.stockMovementModel.create(
+    const movement = await this.stockMovementRepository.create(
       createStockMovementDto,
     );
-    return this.toDto(movement.toObject());
+    return movement;
   }
 
   async update(
     id: string,
     dto: UpdateStockMovementDto,
   ): Promise<GetStockMovementDto> {
-    const existing = await this.stockMovementModel.findById(id).lean();
+    const existing = await this.stockMovementRepository.findOne(id);
 
     if (!existing) {
       throw new NotFoundException(`StockMovement with id ${id} not found`);
     }
 
-    const oldProductId = existing.productId.toString();
+    const oldProductId = existing.productId;
     const newProductId = dto.productId ?? oldProductId;
 
     const oldDelta =
@@ -131,59 +113,36 @@ export class StockMovementsService {
     const newType = dto.type ?? existing.type;
     const newQuantity = dto.quantity ?? existing.quantity;
 
-    const newDelta =
-      newType === StockMovementType.OUT ? -newQuantity : newQuantity;
+    const newDelta = newType === StockMovementType.OUT ? -newQuantity : newQuantity;
 
     if (oldDelta !== null) {
-      await this.productModel.updateOne(
-        { _id: oldProductId },
-        { $inc: { currentStock: -oldDelta } },
-      );
+      await this.productRepository.revertStockDelta(oldProductId, oldDelta);
     }
 
     if (newType === StockMovementType.ADJUSTMENT) {
-      await this.productModel.updateOne(
-        { _id: newProductId },
-        { $set: { currentStock: newQuantity } },
-      );
+      await this.productRepository.setStockQuantity(newProductId, newQuantity);
     } else {
-      const result = await this.productModel.updateOne(
-        {
-          _id: newProductId,
-          ...(newDelta < 0 && {
-            currentStock: { $gte: Math.abs(newDelta) },
-          }),
-        },
-        { $inc: { currentStock: newDelta } },
-      );
+      const success = await this.productRepository.applyStockDelta(newProductId, newDelta);
 
-      if (result.modifiedCount === 0) {
+      if (!success) {
         if (oldDelta !== null) {
-          await this.productModel.updateOne(
-            { _id: oldProductId },
-            { $inc: { currentStock: oldDelta } },
-          );
+          await this.productRepository.revertStockDelta(oldProductId, oldDelta);
         }
         throw new BadRequestException('Insufficient stock');
       }
     }
 
-    const updated = await this.stockMovementModel
-      .findByIdAndUpdate(id, dto, {
-        new: true,
-        runValidators: true,
-      })
-      .lean();
+    const updated = await this.stockMovementRepository.update(id, dto);
 
     if (!updated) {
       throw new NotFoundException();
     }
 
-    return this.toDto(updated);
+    return updated;
   }
 
   async remove(id: string): Promise<void> {
-    const movement = await this.stockMovementModel.findById(id);
+    const movement = await this.stockMovementRepository.findOne(id);
 
     if (!movement) {
       throw new NotFoundException(`StockMovement with id ${id} not found`);
@@ -195,34 +154,13 @@ export class StockMovementsService {
           ? movement.quantity
           : -movement.quantity;
 
-      const result = await this.productModel.updateOne(
-        {
-          _id: movement.productId,
-          ...(delta < 0 && {
-            currentStock: { $gte: Math.abs(delta) },
-          }),
-        },
-        { $inc: { currentStock: delta } },
-      );
+      const success = await this.productRepository.applyStockDelta(movement.productId, delta);
 
-      if (result.modifiedCount === 0) {
+      if (!success) {
         throw new BadRequestException('Cannot revert stock movement');
       }
     }
 
-    await this.stockMovementModel.findByIdAndDelete(id);
-  }
-
-  private toDto(stockMovement: StockMovementDocument): GetStockMovementDto {
-    return {
-      id: stockMovement._id.toString(),
-      productId: stockMovement.productId,
-      quantity: stockMovement.quantity,
-      type: stockMovement.type,
-      reason: stockMovement.reason,
-      createdBy: stockMovement.createdBy,
-      createdAt: stockMovement.createdAt,
-      updatedAt: stockMovement.updatedAt,
-    };
+    await this.stockMovementRepository.delete(id);
   }
 }
