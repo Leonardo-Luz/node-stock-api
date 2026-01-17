@@ -1,9 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ProductStatus } from '@enums/product-status.enum';
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 
 export class GetProductDto {
   @Expose({ name: '_id' })
+  @Type(() => String)
   @ApiProperty({ example: '695effb8efab678ec35554fd' })
   id: string;
 

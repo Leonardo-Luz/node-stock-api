@@ -1,29 +1,38 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { UserRole } from '@enums/user-role.enum';
-import { IsDate, IsEmail, IsEnum, IsMongoId, IsString } from 'class-validator';
+import { Expose, Type } from 'class-transformer';
 
 export class GetUserDto {
-  @IsMongoId()
+  @Expose({ name: '_id' })
+  @Type(() => String)
   @ApiProperty({ example: '695effb8efab678ec35554fd' })
   id: string;
 
-  @IsString()
+  @Expose()
   @ApiProperty({ example: 'John Doe' })
   name: string;
 
-  @IsEmail()
+  @Expose()
   @ApiProperty({ example: 'john@mail.com' })
   email: string;
 
-  @IsEnum(UserRole)
+  @Expose()
   @ApiProperty({ enum: UserRole, example: UserRole.VIEWER })
   role: UserRole;
 
-  @IsDate()
+  @Expose()
+  @ApiProperty({ example: 'p3dtY2weXFYsZOkCSU4EX1XJOriaplsnZR8/AwMot5I=' })
+  password: string;
+
+  @Expose()
+  @ApiProperty({ required: false })
+  hashedRefreshToken?: string;
+
+  @Expose()
   @ApiProperty({ type: String, format: 'date-time' })
   createdAt: Date;
 
-  @IsDate()
+  @Expose()
   @ApiProperty({ type: String, format: 'date-time' })
   updatedAt: Date;
 }
