@@ -89,20 +89,24 @@ export class ProductRepository {
   async setStockQuantity(
     id: string,
     quantity: number,
-  ): Promise<void> {
-    await this.productModel.updateOne(
+  ): Promise<boolean> {
+    const result = await this.productModel.updateOne(
       { _id: id },
       { $set: { currentStock: quantity } },
     );
+
+    return result.modifiedCount === 1;
   }
 
   async revertStockDelta(
     id: string,
     previousDelta: number,
-  ): Promise<void> {
-    await this.productModel.updateOne(
+  ): Promise<boolean> {
+    const result = await this.productModel.updateOne(
       { _id: id },
       { $inc: { currentStock: -previousDelta } },
     );
+
+    return result.modifiedCount === 1;
   }
 }
