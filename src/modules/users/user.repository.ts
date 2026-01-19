@@ -6,13 +6,14 @@ import { UpdateUserDto } from '@users/dtos/update-user.dto';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { plainToInstance } from 'class-transformer';
 import { GetUserDto } from './dtos/get-user.dto';
+import { ParsedQueryFilterUsers } from './interfaces/parsed-query-filter-users.interface';
 
 @Injectable()
 export class UserRepository {
   constructor(
     @InjectModel(User.name)
     private readonly userModel: Model<UserDocument>,
-  ) {}
+  ) { }
 
   async exists(id: string) {
     return await this.userModel.exists({
@@ -20,12 +21,21 @@ export class UserRepository {
     });
   }
 
-  async findAll() {
-    const users = await this.userModel.find().lean();
+  async findAll(filter: ParsedQueryFilterUsers, page: number, limit: number) {
+    const users = await this.userModel
+      .find(filter)
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .sort({ createdAt: -1 })
+      .lean();
 
     return plainToInstance(GetUserDto, users, {
       excludeExtraneousValues: true,
     });
+  }
+
+  async total(filter: ParsedQueryFilterUsers) {
+    return await this.userModel.countDocuments(filter)
   }
 
   async findById(id: string) {
