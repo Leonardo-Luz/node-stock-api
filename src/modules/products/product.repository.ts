@@ -21,19 +21,29 @@ export class ProductRepository {
     });
   }
 
-  async findAll(filter: ParsedQueryFilterProducts) {
-    const products = await this.productModel.find(filter).lean();
+  async findAll(
+    filter: ParsedQueryFilterProducts,
+    page: number,
+    limit: number,
+  ) {
+    const products = await this.productModel
+      .find(filter)
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .sort({ createdAt: -1 })
+      .lean();
 
     return plainToInstance(GetProductDto, products, {
       excludeExtraneousValues: true,
     });
   }
 
-  async findOne(id: string) {
-    console.log(await this.productModel.find().lean());
-    const product = await this.productModel.findById(id).lean();
+  async total(filter: ParsedQueryFilterProducts) {
+    return await this.productModel.countDocuments(filter);
+  }
 
-    console.log(product);
+  async findOne(id: string) {
+    const product = await this.productModel.findById(id).lean();
 
     return plainToInstance(GetProductDto, product, {
       excludeExtraneousValues: true,

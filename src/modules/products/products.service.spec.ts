@@ -10,6 +10,7 @@ const mockProductRepository = {
   create: jest.fn(),
   update: jest.fn(),
   delete: jest.fn(),
+  total: jest.fn(),
 };
 
 describe('ProductsService', () => {
@@ -61,6 +62,7 @@ describe('ProductsService', () => {
 
   describe('findAll', () => {
     it('should return mapped products', async () => {
+      mockProductRepository.total.mockReturnValue(1);
       mockProductRepository.findAll.mockReturnValue([
         {
           id: '1',
@@ -73,10 +75,10 @@ describe('ProductsService', () => {
         },
       ]);
 
-      const result = await service.findAll({});
+      const result = await service.findAll();
 
-      expect(result).toHaveLength(1);
-      expect(result[0].id).toBe('1');
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0].id).toBe('1');
     });
 
     it('should return products matching the category', async () => {
@@ -103,6 +105,7 @@ describe('ProductsService', () => {
         },
       ];
 
+      mockProductRepository.total.mockReturnValue(2);
       mockProductRepository.findAll.mockReturnValue([
         {
           ...mockData[0],
@@ -120,10 +123,14 @@ describe('ProductsService', () => {
 
       const result = await service.findAll({ category });
 
-      expect(mockProductRepository.findAll).toHaveBeenCalledWith({ category });
-      expect(result).toHaveLength(2);
-      expect(result[0].id).toBe('1');
-      expect(result[1].id).toBe('2');
+      expect(mockProductRepository.findAll).toHaveBeenCalledWith(
+        { category },
+        1,
+        10,
+      );
+      expect(result.data).toHaveLength(2);
+      expect(result.data[0].id).toBe('1');
+      expect(result.data[1].id).toBe('2');
     });
   });
 

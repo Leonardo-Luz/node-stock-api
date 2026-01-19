@@ -16,6 +16,7 @@ const mockUserRepository = {
   create: jest.fn(),
   update: jest.fn(),
   delete: jest.fn(),
+  total: jest.fn(),
 };
 
 describe('UsersService', () => {
@@ -74,6 +75,8 @@ describe('UsersService', () => {
 
   describe('findAll', () => {
     it('should return mapped users', async () => {
+      mockUserRepository.total.mockReturnValue(1);
+
       mockUserRepository.findAll.mockReturnValue([
         {
           id: '1',
@@ -87,9 +90,9 @@ describe('UsersService', () => {
 
       const result = await service.findAll();
 
-      expect(result).toHaveLength(1);
-      expect(result[0].id).toBe('1');
-      expect(result[0]).not.toHaveProperty('password');
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0].id).toBe('1');
+      expect(result.data[0]).not.toHaveProperty('password');
     });
   });
 

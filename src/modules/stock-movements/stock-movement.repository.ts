@@ -15,12 +15,25 @@ export class StockMovementRepository {
     private readonly stockMovementModel: Model<StockMovementDocument>,
   ) {}
 
-  async findAll(filter: ParsedQueryFilterStockMovements) {
-    const stockMovements = await this.stockMovementModel.find(filter).lean();
+  async findAll(
+    filter: ParsedQueryFilterStockMovements,
+    page: number,
+    limit: number,
+  ) {
+    const stockMovements = await this.stockMovementModel
+      .find(filter)
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .sort({ createdAt: -1 })
+      .lean();
 
     return plainToInstance(GetStockMovementDto, stockMovements, {
       excludeExtraneousValues: true,
     });
+  }
+
+  async total(filter: ParsedQueryFilterStockMovements) {
+    return await this.stockMovementModel.countDocuments(filter);
   }
 
   async findOne(id: string) {

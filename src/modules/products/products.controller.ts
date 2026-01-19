@@ -10,7 +10,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { GetProductDto } from './dtos/get-product.dto';
-import { ApiCookieAuth, ApiProperty, ApiTags } from '@nestjs/swagger';
+import {
+  ApiCookieAuth,
+  ApiOkResponse,
+  ApiProperty,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
@@ -21,6 +26,7 @@ import { Roles } from '@auth/decorators/roles.decorator';
 import { RolesGuard } from '@auth/guards/roles.guard';
 import { UserRole } from '@enums/user-role.enum';
 import { JwtAuthGuard } from '@auth/guards/jwt-auth.guard';
+import { PaginatedResponseDto } from '@common/pagination/paginated-response.dto';
 
 export class FindOneParams {
   @IsMongoId()
@@ -50,9 +56,11 @@ export class ProductsController {
   @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.VIEWER)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Get()
-  async findAll(
-    @Query() query: FindProductsQueryDto,
-  ): Promise<GetProductDto[]> {
+  @ApiOkResponse({
+    description: 'Paginated list of products',
+    type: PaginatedResponseDto(GetProductDto),
+  })
+  async findAll(@Query() query: FindProductsQueryDto) {
     return await this.productsService.findAll(query);
   }
 

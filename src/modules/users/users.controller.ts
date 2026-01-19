@@ -6,10 +6,16 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { GetUserDto } from './dtos/get-user.dto';
-import { ApiCookieAuth, ApiProperty, ApiTags } from '@nestjs/swagger';
+import {
+  ApiCookieAuth,
+  ApiOkResponse,
+  ApiProperty,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
@@ -19,6 +25,8 @@ import { UserRole } from '@enums/user-role.enum';
 import { RolesGuard } from '@auth/guards/roles.guard';
 import { ApiRoles } from '@auth/decorators/api-roles.decorator';
 import { JwtAuthGuard } from '@auth/guards/jwt-auth.guard';
+import { PaginatedResponseDto } from '@common/pagination/paginated-response.dto';
+import { FindUsersQueryDto } from './dtos/find-users-query.dto';
 
 export class FindOneParams {
   @IsMongoId()
@@ -48,8 +56,12 @@ export class UsersController {
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Get()
-  async findAll(): Promise<GetUserDto[]> {
-    return await this.usersService.findAll();
+  @ApiOkResponse({
+    description: 'Paginated list of users',
+    type: PaginatedResponseDto(GetUserDto),
+  })
+  async findAll(@Query() query: FindUsersQueryDto) {
+    return await this.usersService.findAll(query);
   }
 
   @ApiCookieAuth('access_token')

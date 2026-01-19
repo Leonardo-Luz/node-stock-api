@@ -8,19 +8,50 @@ import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { UserRepository } from './user.repository';
+import { FindUsersQueryDto } from './dtos/find-users-query.dto';
+import { ParsedQueryFilterUsers } from './interfaces/parsed-query-filter-users.interface';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly userRepository: UserRepository) {}
 
-  async findAll(): Promise<GetUserDto[]> {
-    return await this.userRepository.findAll();
+  async findAll(query?: FindUsersQueryDto) {
+    const filter: ParsedQueryFilterUsers = {};
+    let page = 1;
+    let limit = 10;
+
+    if (query?.role) {
+      filter.role = query.role;
+    }
+
+    if (query?.page) {
+      page = query.page;
+    }
+
+    if (query?.limit) {
+      limit = query.limit;
+    }
+
+    const products = await this.userRepository.findAll(filter, page, limit);
+    const total = await this.userRepository.total(filter);
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data: products,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1 && page <= totalPages + 1,
+      },
+    };
   }
 
   async findByEmail(email: string): Promise<GetUserDto | null> {
-    const user = await this.userRepository.findByEmail(email);
-
-    return user;
+    return await this.userRepository.findByEmail(email);
   }
 
   async findById(id: string): Promise<GetUserDto> {
@@ -34,9 +65,7 @@ export class UsersService {
   }
 
   async findByIdWithRefreshToken(id: string): Promise<GetUserDto | null> {
-    const user = await this.userRepository.findByIdWithRefreshToken(id);
-
-    return user;
+    return await this.userRepository.findByIdWithRefreshToken(id);
   }
 
   async create(createUserDto: CreateUserDto): Promise<GetUserDto> {
