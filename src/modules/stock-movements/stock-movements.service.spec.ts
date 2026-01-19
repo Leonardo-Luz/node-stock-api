@@ -14,6 +14,7 @@ const mockStockMovementRepository = {
   create: jest.fn(),
   update: jest.fn(),
   delete: jest.fn(),
+  total: jest.fn(),
 };
 
 const mockProductRepository = {
@@ -96,7 +97,8 @@ describe('StockMovementService', () => {
   });
 
   describe('findAll', () => {
-    it('should return mapped stockMovement', async () => {
+    it('should return pagineted stockMovement', async () => {
+      mockStockMovementRepository.total.mockResolvedValue(1);
       mockStockMovementRepository.findAll.mockReturnValue([
         {
           id: '1',
@@ -112,8 +114,8 @@ describe('StockMovementService', () => {
 
       const result = await service.findAll();
 
-      expect(result).toHaveLength(1);
-      expect(result[0].id).toBe('1');
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0].id).toBe('1');
     });
 
     it('should return stock movement matching the movement reason', async () => {
@@ -142,6 +144,7 @@ describe('StockMovementService', () => {
         },
       ];
 
+      mockStockMovementRepository.total.mockResolvedValue(1);
       mockStockMovementRepository.findAll.mockReturnValue([
         {
           ...mockData[0],
@@ -159,12 +162,10 @@ describe('StockMovementService', () => {
 
       const result = await service.findAll({ reason });
 
-      expect(mockStockMovementRepository.findAll).toHaveBeenCalledWith({
-        reason,
-      });
-      expect(result).toHaveLength(2);
-      expect(result[0].id).toBe('1');
-      expect(result[1].id).toBe('2');
+      expect(mockStockMovementRepository.findAll).toHaveBeenCalledWith({ reason }, 1, 10);
+      expect(result.data).toHaveLength(2);
+      expect(result.data[0].id).toBe('1');
+      expect(result.data[1].id).toBe('2');
     });
   });
 

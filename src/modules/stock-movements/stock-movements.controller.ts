@@ -10,7 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { GetStockMovementDto } from './dtos/get-stock-movement.dto';
-import { ApiCookieAuth, ApiProperty, ApiTags } from '@nestjs/swagger';
+import { ApiCookieAuth, ApiOkResponse, ApiProperty, ApiTags } from '@nestjs/swagger';
 import { StockMovementsService } from './stock-movements.service';
 import { CreateStockMovementDto } from './dtos/create-stock-movement.dto';
 import { UpdateStockMovementDto } from './dtos/update-stock-movement.dto';
@@ -21,6 +21,7 @@ import { Roles } from '@auth/decorators/roles.decorator';
 import { UserRole } from '@enums/user-role.enum';
 import { RolesGuard } from '@auth/guards/roles.guard';
 import { JwtAuthGuard } from '@auth/guards/jwt-auth.guard';
+import { PaginatedResponseDto } from '@common/pagination/paginated-response.dto';
 
 export class FindOneParams {
   @IsMongoId()
@@ -43,16 +44,20 @@ export class DeleteParams {
 @ApiTags('Stock Movements')
 @Controller('stock-movements')
 export class StockMovementsController {
-  constructor(private readonly stockMovementsService: StockMovementsService) {}
+  constructor(private readonly stockMovementsService: StockMovementsService) { }
 
   @ApiCookieAuth('access_token')
   @ApiRoles(UserRole.ADMIN, UserRole.MANAGER, UserRole.VIEWER)
   @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.VIEWER)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Get()
+  @ApiOkResponse({
+    description: 'Paginated list of stock movements',
+    type: PaginatedResponseDto(GetStockMovementDto),
+  })
   async findAll(
     @Query() query: FindStockMovementQueryDto,
-  ): Promise<GetStockMovementDto[]> {
+  ) {
     return await this.stockMovementsService.findAll(query);
   }
 

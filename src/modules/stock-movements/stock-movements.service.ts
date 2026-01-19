@@ -19,23 +19,55 @@ export class StockMovementsService {
     private readonly stockMovementRepository: StockMovementRepository,
     private readonly productRepository: ProductRepository,
     private readonly userRepository: UserRepository,
-  ) {}
+  ) { }
 
   async findAll(
     query?: FindStockMovementQueryDto,
-  ): Promise<GetStockMovementDto[]> {
+  ) {
     const filter: ParsedQueryFilterStockMovements = {};
+    let page = 1;
+    let limit = 10;
 
-    if (query?.productId) filter.productId = query.productId;
+    if (query?.productId) {
+      filter.productId = query.productId;
+    }
 
-    if (query?.reason) filter.reason = query.reason;
+    if (query?.reason) {
+      filter.reason = query.reason;
+    }
 
-    if (query?.type) filter.type = query.type;
+    if (query?.type) {
+      filter.type = query.type;
+    }
 
-    if (query?.createdBy) filter.createdBy = query.createdBy;
+    if (query?.createdBy) {
+      filter.createdBy = query.createdBy;
+    }
 
-    const stockMovement = await this.stockMovementRepository.findAll(filter);
-    return stockMovement;
+    if (query?.page) {
+      page = query.page
+    }
+
+    if (query?.limit) {
+      limit = query.limit
+    }
+
+    const stockMovements = await this.stockMovementRepository.findAll(filter, page, limit);
+    const total = await this.stockMovementRepository.total(filter);
+
+    const totalPages = Math.ceil(total / limit)
+
+    return {
+      data: stockMovements,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1 && page <= totalPages + 1
+      }
+    };
   }
 
   async findOne(id: string): Promise<GetStockMovementDto> {
