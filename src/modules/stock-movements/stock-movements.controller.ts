@@ -10,7 +10,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { GetStockMovementDto } from './dtos/get-stock-movement.dto';
-import { ApiCookieAuth, ApiOkResponse, ApiProperty, ApiTags } from '@nestjs/swagger';
+import {
+  ApiCookieAuth,
+  ApiOkResponse,
+  ApiProperty,
+  ApiTags,
+} from '@nestjs/swagger';
 import { StockMovementsService } from './stock-movements.service';
 import { CreateStockMovementDto } from './dtos/create-stock-movement.dto';
 import { UpdateStockMovementDto } from './dtos/update-stock-movement.dto';
@@ -44,7 +49,7 @@ export class DeleteParams {
 @ApiTags('Stock Movements')
 @Controller('stock-movements')
 export class StockMovementsController {
-  constructor(private readonly stockMovementsService: StockMovementsService) { }
+  constructor(private readonly stockMovementsService: StockMovementsService) {}
 
   @ApiCookieAuth('access_token')
   @ApiRoles(UserRole.ADMIN, UserRole.MANAGER, UserRole.VIEWER)
@@ -55,9 +60,7 @@ export class StockMovementsController {
     description: 'Paginated list of stock movements',
     type: PaginatedResponseDto(GetStockMovementDto),
   })
-  async findAll(
-    @Query() query: FindStockMovementQueryDto,
-  ) {
+  async findAll(@Query() query: FindStockMovementQueryDto) {
     return await this.stockMovementsService.findAll(query);
   }
 

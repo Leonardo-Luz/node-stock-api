@@ -13,7 +13,7 @@ export class UserRepository {
   constructor(
     @InjectModel(User.name)
     private readonly userModel: Model<UserDocument>,
-  ) { }
+  ) {}
 
   async exists(id: string) {
     return await this.userModel.exists({
@@ -35,7 +35,7 @@ export class UserRepository {
   }
 
   async total(filter: ParsedQueryFilterUsers) {
-    return await this.userModel.countDocuments(filter)
+    return await this.userModel.countDocuments(filter);
   }
 
   async findById(id: string) {

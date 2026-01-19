@@ -75,7 +75,7 @@ describe('UsersService', () => {
 
   describe('findAll', () => {
     it('should return mapped users', async () => {
-      mockUserRepository.total.mockReturnValue(1)
+      mockUserRepository.total.mockReturnValue(1);
 
       mockUserRepository.findAll.mockReturnValue([
         {

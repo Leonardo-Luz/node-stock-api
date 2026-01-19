@@ -8,7 +8,7 @@ import { ProductRepository } from './product.repository';
 
 @Injectable()
 export class ProductsService {
-  constructor(private readonly productRepository: ProductRepository) { }
+  constructor(private readonly productRepository: ProductRepository) {}
 
   async findAll(query?: FindProductsQueryDto) {
     const filter: ParsedQueryFilterProducts = {};
@@ -30,17 +30,17 @@ export class ProductsService {
     }
 
     if (query?.page) {
-      page = query.page
+      page = query.page;
     }
 
     if (query?.limit) {
-      limit = query.limit
+      limit = query.limit;
     }
 
     const products = await this.productRepository.findAll(filter, page, limit);
     const total = await this.productRepository.total(filter);
 
-    const totalPages = Math.ceil(total / limit)
+    const totalPages = Math.ceil(total / limit);
 
     return {
       data: products,
@@ -50,8 +50,8 @@ export class ProductsService {
         limit,
         totalPages,
         hasNextPage: page < totalPages,
-        hasPreviousPage: page > 1 && page <= totalPages + 1
-      }
+        hasPreviousPage: page > 1 && page <= totalPages + 1,
+      },
     };
   }
 

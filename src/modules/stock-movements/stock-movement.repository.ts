@@ -13,9 +13,13 @@ export class StockMovementRepository {
   constructor(
     @InjectModel(StockMovement.name)
     private readonly stockMovementModel: Model<StockMovementDocument>,
-  ) { }
+  ) {}
 
-  async findAll(filter: ParsedQueryFilterStockMovements, page: number, limit: number) {
+  async findAll(
+    filter: ParsedQueryFilterStockMovements,
+    page: number,
+    limit: number,
+  ) {
     const stockMovements = await this.stockMovementModel
       .find(filter)
       .skip((page - 1) * limit)
@@ -29,7 +33,7 @@ export class StockMovementRepository {
   }
 
   async total(filter: ParsedQueryFilterStockMovements) {
-    return await this.stockMovementModel.countDocuments(filter)
+    return await this.stockMovementModel.countDocuments(filter);
   }
 
   async findOne(id: string) {

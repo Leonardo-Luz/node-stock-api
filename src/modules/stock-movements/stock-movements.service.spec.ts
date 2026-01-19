@@ -162,7 +162,11 @@ describe('StockMovementService', () => {
 
       const result = await service.findAll({ reason });
 
-      expect(mockStockMovementRepository.findAll).toHaveBeenCalledWith({ reason }, 1, 10);
+      expect(mockStockMovementRepository.findAll).toHaveBeenCalledWith(
+        { reason },
+        1,
+        10,
+      );
       expect(result.data).toHaveLength(2);
       expect(result.data[0].id).toBe('1');
       expect(result.data[1].id).toBe('2');

@@ -13,7 +13,7 @@ export class ProductRepository {
   constructor(
     @InjectModel(Product.name)
     private readonly productModel: Model<ProductDocument>,
-  ) { }
+  ) {}
 
   async exists(id: string) {
     return await this.productModel.exists({
@@ -21,7 +21,11 @@ export class ProductRepository {
     });
   }
 
-  async findAll(filter: ParsedQueryFilterProducts, page: number, limit: number) {
+  async findAll(
+    filter: ParsedQueryFilterProducts,
+    page: number,
+    limit: number,
+  ) {
     const products = await this.productModel
       .find(filter)
       .skip((page - 1) * limit)
@@ -35,7 +39,7 @@ export class ProductRepository {
   }
 
   async total(filter: ParsedQueryFilterProducts) {
-    return await this.productModel.countDocuments(filter)
+    return await this.productModel.countDocuments(filter);
   }
 
   async findOne(id: string) {

@@ -10,7 +10,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { GetUserDto } from './dtos/get-user.dto';
-import { ApiCookieAuth, ApiOkResponse, ApiProperty, ApiTags } from '@nestjs/swagger';
+import {
+  ApiCookieAuth,
+  ApiOkResponse,
+  ApiProperty,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
@@ -44,7 +49,7 @@ export class DeleteParams {
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
   @ApiCookieAuth('access_token')
   @ApiRoles(UserRole.ADMIN)
@@ -55,9 +60,7 @@ export class UsersController {
     description: 'Paginated list of users',
     type: PaginatedResponseDto(GetUserDto),
   })
-  async findAll(
-    @Query() query: FindUsersQueryDto,
-  ) {
+  async findAll(@Query() query: FindUsersQueryDto) {
     return await this.usersService.findAll(query);
   }
 

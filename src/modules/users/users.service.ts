@@ -13,7 +13,7 @@ import { ParsedQueryFilterUsers } from './interfaces/parsed-query-filter-users.i
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly userRepository: UserRepository) { }
+  constructor(private readonly userRepository: UserRepository) {}
 
   async findAll(query?: FindUsersQueryDto) {
     const filter: ParsedQueryFilterUsers = {};
@@ -25,17 +25,17 @@ export class UsersService {
     }
 
     if (query?.page) {
-      page = query.page
+      page = query.page;
     }
 
     if (query?.limit) {
-      limit = query.limit
+      limit = query.limit;
     }
 
     const products = await this.userRepository.findAll(filter, page, limit);
     const total = await this.userRepository.total(filter);
 
-    const totalPages = Math.ceil(total / limit)
+    const totalPages = Math.ceil(total / limit);
 
     return {
       data: products,
@@ -45,8 +45,8 @@ export class UsersService {
         limit,
         totalPages,
         hasNextPage: page < totalPages,
-        hasPreviousPage: page > 1 && page <= totalPages + 1
-      }
+        hasPreviousPage: page > 1 && page <= totalPages + 1,
+      },
     };
   }
 

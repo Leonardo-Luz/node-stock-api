@@ -62,7 +62,7 @@ describe('ProductsService', () => {
 
   describe('findAll', () => {
     it('should return mapped products', async () => {
-      mockProductRepository.total.mockReturnValue(1)
+      mockProductRepository.total.mockReturnValue(1);
       mockProductRepository.findAll.mockReturnValue([
         {
           id: '1',
@@ -105,7 +105,7 @@ describe('ProductsService', () => {
         },
       ];
 
-      mockProductRepository.total.mockReturnValue(2)
+      mockProductRepository.total.mockReturnValue(2);
       mockProductRepository.findAll.mockReturnValue([
         {
           ...mockData[0],
@@ -123,7 +123,11 @@ describe('ProductsService', () => {
 
       const result = await service.findAll({ category });
 
-      expect(mockProductRepository.findAll).toHaveBeenCalledWith({ category }, 1, 10);
+      expect(mockProductRepository.findAll).toHaveBeenCalledWith(
+        { category },
+        1,
+        10,
+      );
       expect(result.data).toHaveLength(2);
       expect(result.data[0].id).toBe('1');
       expect(result.data[1].id).toBe('2');

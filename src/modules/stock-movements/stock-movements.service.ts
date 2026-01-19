@@ -19,11 +19,9 @@ export class StockMovementsService {
     private readonly stockMovementRepository: StockMovementRepository,
     private readonly productRepository: ProductRepository,
     private readonly userRepository: UserRepository,
-  ) { }
+  ) {}
 
-  async findAll(
-    query?: FindStockMovementQueryDto,
-  ) {
+  async findAll(query?: FindStockMovementQueryDto) {
     const filter: ParsedQueryFilterStockMovements = {};
     let page = 1;
     let limit = 10;
@@ -45,17 +43,21 @@ export class StockMovementsService {
     }
 
     if (query?.page) {
-      page = query.page
+      page = query.page;
     }
 
     if (query?.limit) {
-      limit = query.limit
+      limit = query.limit;
     }
 
-    const stockMovements = await this.stockMovementRepository.findAll(filter, page, limit);
+    const stockMovements = await this.stockMovementRepository.findAll(
+      filter,
+      page,
+      limit,
+    );
     const total = await this.stockMovementRepository.total(filter);
 
-    const totalPages = Math.ceil(total / limit)
+    const totalPages = Math.ceil(total / limit);
 
     return {
       data: stockMovements,
@@ -65,8 +67,8 @@ export class StockMovementsService {
         limit,
         totalPages,
         hasNextPage: page < totalPages,
-        hasPreviousPage: page > 1 && page <= totalPages + 1
-      }
+        hasPreviousPage: page > 1 && page <= totalPages + 1,
+      },
     };
   }
 
